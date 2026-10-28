@@ -12,11 +12,15 @@ describe("AgentHub Web API", () => {
     await initDb();
     // Clean up test package in case it exists from previous runs
     await db.delete(packages).where(eq(packages.id, "bob/vue-agent"));
+    await db.delete(packages).where(eq(packages.id, "bob/defensive-agent"));
+    await db.delete(packages).where(eq(packages.id, "bob/auth-agent"));
   });
 
   afterAll(async () => {
     // Clean up test package
     await db.delete(packages).where(eq(packages.id, "bob/vue-agent"));
+    await db.delete(packages).where(eq(packages.id, "bob/defensive-agent"));
+    await db.delete(packages).where(eq(packages.id, "bob/auth-agent"));
   });
 
   describe("GET /api/packages", () => {
@@ -220,6 +224,251 @@ describe("AgentHub Web API", () => {
       expect(fetchedPkg.rulesAst[0].title).toBe("rules/vue.md > ## 1. Vue 3 Composition API Guidelines");
       expect(fetchedPkg.mcpServers.length).toBe(1);
       expect(fetchedPkg.mcpServers[0].name).toBe("vue-docs");
+    });
+
+    it("calculates tokenFootprint using Math.max(explicitTokens, computedTokens)", async () => {
+      // 1. explicitTokens higher than computedTokens
+      const payloadHigh = {
+        owner: "bob",
+        repo: "vue-agent",
+        name: "Vue Agent",
+        tokenFootprint: 1200,
+        rulesAst: [{ title: "R1", file: "r1.md", tokens: 300, content: "abc" }],
+      };
+      const req1 = new NextRequest("http://localhost:3000/api/index", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadHigh),
+      });
+      const res1 = await postIndex(req1);
+      const data1 = await res1.json();
+      expect(data1.package.tokenFootprint).toBe(1200);
+
+      // 2. computedTokens higher than explicitTokens
+      const payloadLow = {
+        owner: "bob",
+        repo: "vue-agent",
+        name: "Vue Agent",
+        tokenFootprint: 100,
+        rulesAst: [{ title: "R1", file: "r1.md", tokens: 500, content: "abc" }],
+      };
+      const req2 = new NextRequest("http://localhost:3000/api/index", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payloadLow),
+      });
+      const res2 = await postIndex(req2);
+      const data2 = await res2.json();
+      expect(data2.package.tokenFootprint).toBe(500);
+    });
+
+    it("handles defensive parsing of non-array fields, string isClean, and securityRisk", async () => {
+      const defensivePayload = {
+        owner: "bob",
+        repo: "defensive-agent",
+        name: "Defensive Agent",
+        platforms: null,
+        tags: "not-an-array",
+        rulesAst: null,
+        skills: null,
+        mcpServers: undefined,
+        isClean: "false",
+        securityRisk: "MEDIUM",
+      };
+
+      const postReq = new NextRequest("http://localhost:3000/api/index", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(defensivePayload),
+      });
+      const postRes = await postIndex(postReq);
+      expect(postRes.status).toBe(201);
+      const postData = await postRes.json();
+
+      expect(postData.package.isClean).toBe(false);
+      expect(postData.package.securityRisk).toBe("medium");
+      expect(Array.isArray(postData.package.platforms)).toBe(true);
+      expect(postData.package.platforms).toEqual([]);
+      expect(Array.isArray(postData.package.tags)).toBe(true);
+      expect(postData.package.tags).toEqual([]);
+      expect(Array.isArray(postData.package.rulesAst)).toBe(true);
+      expect(postData.package.rulesAst).toEqual([]);
+      expect(Array.isArray(postData.package.skills)).toBe(true);
+      expect(postData.package.skills).toEqual([]);
+      expect(Array.isArray(postData.package.mcpServers)).toBe(true);
+      expect(postData.package.mcpServers).toEqual([]);
+      expect(postData.package.tokenFootprint).toBe(850);
+    });
+
+    it("rejects requests without or with wrong token with 401 when REGISTRY_SECRET is set", async () => {
+      const origSecret = process.env.REGISTRY_SECRET;
+      try {
+        process.env.REGISTRY_SECRET = "test-secret-123";
+
+        const authPayload = {
+          owner: "bob",
+          repo: "auth-agent",
+          name: "Auth Test Agent",
+        };
+
+        // Without auth header
+        const noAuthReq = new NextRequest("http://localhost:3000/api/index", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(authPayload),
+        });
+        const noAuthRes = await postIndex(noAuthReq);
+        expect(noAuthRes.status).toBe(401);
+        expect(noAuthRes.headers.get("www-authenticate")).toBe("Bearer");
+        const noAuthData = await noAuthRes.json();
+        expect(noAuthData.error).toBe("Unauthorized: Invalid or missing publish token.");
+
+        // With wrong auth token
+        const wrongAuthReq = new NextRequest("http://localhost:3000/api/index", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer invalid-token",
+          },
+          body: JSON.stringify(authPayload),
+        });
+        const wrongAuthRes = await postIndex(wrongAuthReq);
+        expect(wrongAuthRes.status).toBe(401);
+        expect(wrongAuthRes.headers.get("www-authenticate")).toBe("Bearer");
+        const wrongAuthData = await wrongAuthRes.json();
+        expect(wrongAuthData.error).toBe("Unauthorized: Invalid or missing publish token.");
+      } finally {
+        if (origSecret !== undefined) {
+          process.env.REGISTRY_SECRET = origSecret;
+        } else {
+          delete process.env.REGISTRY_SECRET;
+        }
+      }
+    });
+
+    it("rejects malformed authorization headers with 401 and WWW-Authenticate header", async () => {
+      const origSecret = process.env.REGISTRY_SECRET;
+      try {
+        process.env.REGISTRY_SECRET = "test-secret-123";
+
+        const authPayload = {
+          owner: "bob",
+          repo: "auth-agent",
+          name: "Auth Test Agent",
+        };
+
+        const malformedHeaders = [
+          "test-secret-123", // missing Bearer prefix
+          "Basic dXNlcjpwYXNz", // Basic auth scheme
+          "Bearer ", // empty token after Bearer
+          "Bearer", // no token
+        ];
+
+        for (const authHeader of malformedHeaders) {
+          const req = new NextRequest("http://localhost:3000/api/index", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: authHeader,
+            },
+            body: JSON.stringify(authPayload),
+          });
+          const res = await postIndex(req);
+          expect(res.status).toBe(401);
+          expect(res.headers.get("www-authenticate")).toBe("Bearer");
+          const data = await res.json();
+          expect(data.error).toBe("Unauthorized: Invalid or missing publish token.");
+        }
+      } finally {
+        if (origSecret !== undefined) {
+          process.env.REGISTRY_SECRET = origSecret;
+        } else {
+          delete process.env.REGISTRY_SECRET;
+        }
+      }
+    });
+
+    it("respects AGENTHUB_PUBLISH_SECRET as an alternate env secret", async () => {
+      const origRegSecret = process.env.REGISTRY_SECRET;
+      const origPubSecret = process.env.AGENTHUB_PUBLISH_SECRET;
+      try {
+        delete process.env.REGISTRY_SECRET;
+        process.env.AGENTHUB_PUBLISH_SECRET = "pub-secret-alternate-456";
+
+        const authPayload = {
+          owner: "bob",
+          repo: "auth-agent",
+          name: "Auth Test Agent",
+        };
+
+        // Without auth header -> 401
+        const noAuthReq = new NextRequest("http://localhost:3000/api/index", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(authPayload),
+        });
+        const noAuthRes = await postIndex(noAuthReq);
+        expect(noAuthRes.status).toBe(401);
+        expect(noAuthRes.headers.get("www-authenticate")).toBe("Bearer");
+
+        // With correct token -> 201
+        const authReq = new NextRequest("http://localhost:3000/api/index", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer pub-secret-alternate-456",
+          },
+          body: JSON.stringify(authPayload),
+        });
+        const authRes = await postIndex(authReq);
+        expect(authRes.status).toBe(201);
+        const authData = await authRes.json();
+        expect(authData.message).toBe("Package indexed successfully");
+      } finally {
+        if (origRegSecret !== undefined) {
+          process.env.REGISTRY_SECRET = origRegSecret;
+        } else {
+          delete process.env.REGISTRY_SECRET;
+        }
+        if (origPubSecret !== undefined) {
+          process.env.AGENTHUB_PUBLISH_SECRET = origPubSecret;
+        } else {
+          delete process.env.AGENTHUB_PUBLISH_SECRET;
+        }
+      }
+    });
+
+    it("succeeds with 201 when correct Authorization: Bearer <secret> header is supplied when REGISTRY_SECRET is set", async () => {
+      const origSecret = process.env.REGISTRY_SECRET;
+      try {
+        process.env.REGISTRY_SECRET = "test-secret-123";
+
+        const authPayload = {
+          owner: "bob",
+          repo: "auth-agent",
+          name: "Auth Test Agent",
+        };
+
+        const authReq = new NextRequest("http://localhost:3000/api/index", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer test-secret-123",
+          },
+          body: JSON.stringify(authPayload),
+        });
+        const authRes = await postIndex(authReq);
+        expect(authRes.status).toBe(201);
+        const authData = await authRes.json();
+        expect(authData.message).toBe("Package indexed successfully");
+        expect(authData.package.id).toBe("bob/auth-agent");
+      } finally {
+        if (origSecret !== undefined) {
+          process.env.REGISTRY_SECRET = origSecret;
+        } else {
+          delete process.env.REGISTRY_SECRET;
+        }
+      }
     });
   });
 });

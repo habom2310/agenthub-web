@@ -1,14 +1,73 @@
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
+import { createClient, type Client } from "@libsql/client";
+import { drizzle as drizzleLibsql, type LibSQLDatabase } from "drizzle-orm/libsql";
+import { drizzle as drizzleD1, type DrizzleD1Database } from "drizzle-orm/d1";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "./schema";
 import { packages, Package, NewPackage } from "./schema";
 import { eq } from "drizzle-orm";
 
-const client = createClient({
-  url: process.env.DATABASE_URL || "file:agenthub.db",
-});
+let localClient: Client | null = null;
+let localDb: LibSQLDatabase<typeof schema> | null = null;
+let cachedD1Db: DrizzleD1Database<typeof schema> | null = null;
+let cachedD1Binding: D1Database | null = null;
 
-export const db = drizzle(client, { schema });
+function getLocalClient(): Client {
+  if (!localClient) {
+    localClient = createClient({
+      url: process.env.DATABASE_URL || "file:agenthub.db",
+    });
+  }
+  return localClient;
+}
+
+function getLocalDb(): LibSQLDatabase<typeof schema> {
+  if (!localDb) {
+    localDb = drizzleLibsql(getLocalClient(), { schema });
+  }
+  return localDb;
+}
+
+export function getDb(): DrizzleD1Database<typeof schema> | LibSQLDatabase<typeof schema> {
+  let ctx: ReturnType<typeof getCloudflareContext> | undefined;
+  try {
+    ctx = getCloudflareContext();
+  } catch {
+    // Cloudflare context unavailable; fall back to local LibSQL/SQLite
+  }
+
+  if (ctx) {
+    if (!ctx.env?.DB) {
+      throw new Error(
+        "Cloudflare context detected, but DB binding (ctx.env.DB) is missing. Check wrangler.jsonc d1_databases configuration."
+      );
+    }
+    if (cachedD1Db && cachedD1Binding === ctx.env.DB) {
+      return cachedD1Db;
+    }
+    cachedD1Binding = ctx.env.DB;
+    cachedD1Db = drizzleD1(ctx.env.DB, { schema });
+    return cachedD1Db;
+  }
+
+  return getLocalDb();
+}
+
+export const db = new Proxy({} as ReturnType<typeof getDb>, {
+  get(_target, prop, _receiver) {
+    if (prop === "then") {
+      return undefined;
+    }
+    const target = getDb();
+    const value = Reflect.get(target, prop, target);
+    if (typeof value === "function") {
+      return value.bind(target);
+    }
+    return value;
+  },
+  has(_target, prop) {
+    return prop in getDb();
+  },
+});
 
 const SEED_PACKAGES: NewPackage[] = [
   {
@@ -324,43 +383,72 @@ const SEED_PACKAGES: NewPackage[] = [
   }
 ];
 
+const CREATE_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS packages (
+    id TEXT PRIMARY KEY,
+    owner TEXT NOT NULL,
+    repo TEXT NOT NULL,
+    name TEXT NOT NULL,
+    version TEXT NOT NULL DEFAULT '1.0.0',
+    description TEXT NOT NULL DEFAULT '',
+    type TEXT NOT NULL DEFAULT 'profile',
+    platforms TEXT NOT NULL DEFAULT '[]',
+    tags TEXT NOT NULL DEFAULT '[]',
+    license TEXT NOT NULL DEFAULT 'MIT',
+    stars INTEGER NOT NULL DEFAULT 0,
+    install_count INTEGER NOT NULL DEFAULT 0,
+    token_footprint INTEGER NOT NULL DEFAULT 0,
+    security_risk TEXT NOT NULL DEFAULT 'low',
+    is_clean INTEGER NOT NULL DEFAULT 1,
+    mcp_servers TEXT NOT NULL DEFAULT '[]',
+    skills TEXT NOT NULL DEFAULT '[]',
+    rules_ast TEXT NOT NULL DEFAULT '[]',
+    readme TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`;
+
 let initialized = false;
+let initPromise: Promise<void> | null = null;
 
 export async function initDb() {
   if (initialized) return;
+  if (initPromise) return initPromise;
 
-  await client.execute(`
-    CREATE TABLE IF NOT EXISTS packages (
-      id TEXT PRIMARY KEY,
-      owner TEXT NOT NULL,
-      repo TEXT NOT NULL,
-      name TEXT NOT NULL,
-      version TEXT NOT NULL DEFAULT '1.0.0',
-      description TEXT NOT NULL DEFAULT '',
-      type TEXT NOT NULL DEFAULT 'profile',
-      platforms TEXT NOT NULL DEFAULT '[]',
-      tags TEXT NOT NULL DEFAULT '[]',
-      license TEXT NOT NULL DEFAULT 'MIT',
-      stars INTEGER NOT NULL DEFAULT 0,
-      install_count INTEGER NOT NULL DEFAULT 0,
-      token_footprint INTEGER NOT NULL DEFAULT 0,
-      security_risk TEXT NOT NULL DEFAULT 'low',
-      is_clean INTEGER NOT NULL DEFAULT 1,
-      mcp_servers TEXT NOT NULL DEFAULT '[]',
-      skills TEXT NOT NULL DEFAULT '[]',
-      rules_ast TEXT NOT NULL DEFAULT '[]',
-      readme TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-  `);
-
-  const existing = await db.select().from(packages);
-  if (existing.length === 0) {
-    for (const pkg of SEED_PACKAGES) {
-      await db.insert(packages).values(pkg);
+  initPromise = (async () => {
+    let ctx: ReturnType<typeof getCloudflareContext> | undefined;
+    try {
+      ctx = getCloudflareContext();
+    } catch {
+      // Cloudflare context unavailable
     }
-  }
 
-  initialized = true;
+    const cleanSql = CREATE_TABLE_SQL.replace(/\s+/g, " ").trim();
+
+    if (ctx) {
+      if (!ctx.env?.DB) {
+        throw new Error(
+          "Cloudflare context detected, but DB binding (ctx.env.DB) is missing. Check wrangler.jsonc d1_databases configuration."
+        );
+      }
+      await ctx.env.DB.prepare(cleanSql).run();
+    } else {
+      const client = getLocalClient();
+      await client.execute(cleanSql);
+    }
+
+    const [existing] = await db.select().from(packages).limit(1);
+    if (!existing) {
+      for (const pkg of SEED_PACKAGES) {
+        await db.insert(packages).values(pkg).onConflictDoNothing();
+      }
+    }
+
+    initialized = true;
+  })().finally(() => {
+    initPromise = null;
+  });
+
+  return initPromise;
 }

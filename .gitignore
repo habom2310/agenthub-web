@@ -33,6 +33,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# cloudflare / opennext
+/.open-next/
+/.wrangler/
+
 # database
 *.db
 *.db-journal
