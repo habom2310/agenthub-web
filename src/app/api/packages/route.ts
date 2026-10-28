@@ -1,0 +1,75 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db, initDb } from "@/lib/db";
+import { packages, Package } from "@/lib/db/schema";
+import { desc, asc, like, or } from "drizzle-orm";
+
+export async function GET(request: NextRequest) {
+  try {
+    await initDb();
+
+    const { searchParams } = new URL(request.url);
+    const q = (searchParams.get("q") || "").toLowerCase().trim();
+    const platform = (searchParams.get("platform") || "").toLowerCase().trim();
+    const type = (searchParams.get("type") || "").toLowerCase().trim();
+    const tag = (searchParams.get("tag") || "").toLowerCase().trim();
+    const sort = (searchParams.get("sort") || "stars").toLowerCase().trim();
+
+    let allPackages: Package[] = await db.select().from(packages);
+
+    // Filter by query (name, id, description, tags)
+    if (q) {
+      allPackages = allPackages.filter((pkg) => {
+        return (
+          pkg.id.toLowerCase().includes(q) ||
+          pkg.name.toLowerCase().includes(q) ||
+          pkg.description.toLowerCase().includes(q) ||
+          pkg.tags.some((t) => t.toLowerCase().includes(q))
+        );
+      });
+    }
+
+    // Filter by platform
+    if (platform && platform !== "all") {
+      allPackages = allPackages.filter((pkg) =>
+        pkg.platforms.map((p) => p.toLowerCase()).includes(platform)
+      );
+    }
+
+    // Filter by type (profile / addon)
+    if (type && type !== "all") {
+      allPackages = allPackages.filter((pkg) => pkg.type.toLowerCase() === type);
+    }
+
+    // Filter by tag
+    if (tag) {
+      allPackages = allPackages.filter((pkg) =>
+        pkg.tags.map((t) => t.toLowerCase()).includes(tag)
+      );
+    }
+
+    // Sort
+    allPackages.sort((a, b) => {
+      if (sort === "installs") {
+        return b.installCount - a.installCount;
+      } else if (sort === "tokens") {
+        return a.tokenFootprint - b.tokenFootprint;
+      } else if (sort === "recent") {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      } else {
+        // default: stars
+        return b.stars - a.stars;
+      }
+    });
+
+    return NextResponse.json({
+      total: allPackages.length,
+      packages: allPackages,
+    });
+  } catch (error) {
+    console.error("Failed to fetch packages:", error);
+    return NextResponse.json(
+      { error: "Internal server error fetching packages" },
+      { status: 500 }
+    );
+  }
+}
