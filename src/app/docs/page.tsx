@@ -142,7 +142,7 @@ export default function DocsPage() {
             <InstallPill command="agenthub budget" />
             <InstallPill command="agenthub info ~/.agenthub" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
-              <code>share</code> stops on hard-coded keys in skill or <code>scripts/</code> files and on high-risk scripts or MCP servers. It does not scan <code>rules/</code> or <code>mcp/servers.json</code>, so check those for pasted keys yourself.
+              <code>share</code> stops on hard-coded keys in skill or <code>scripts/</code> files and on high-risk scripts or MCP servers. It does not scan <code>rules/</code> or <code>mcp/servers.json</code>, so check those for pasted keys yourself. Fix what it finds, or pass <code>--force</code> if you are sure it is safe.
             </p>
           </div>
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
@@ -155,6 +155,7 @@ export default function DocsPage() {
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
             <div className="text-xs font-bold text-signal-soft"># 6. Publish to the registry</div>
             <InstallPill command="agenthub login" />
+            <InstallPill command="agenthub whoami" />
             <InstallPill command="agenthub share --publish" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
               Publishes as your GitHub account, which needs push access to the repo. Your package appears at <code>/packages/&lt;you&gt;/my-agent-setup</code> and in <code>agenthub search</code>.
@@ -171,7 +172,7 @@ export default function DocsPage() {
         </div>
 
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Others install your package with <code>agenthub add &lt;you&gt;/my-agent-setup</code>, or switch to it as a whole profile with <code>agenthub profile use &lt;you&gt;/my-agent-setup</code>. For error messages and fixes, see the 
+          Others install your package with <code>agenthub add &lt;you&gt;/my-agent-setup</code>, or switch to it as a whole profile with <code>agenthub profile use &lt;you&gt;/my-agent-setup</code>. For error messages and fixes, see the{" "}
           <a href="https://github.com/habom2310/agenthub#6-sharing--publishing" className="text-signal-soft hover:text-signal" target="_blank" rel="noopener noreferrer">full sharing guide</a>.
         </p>
       </section>
