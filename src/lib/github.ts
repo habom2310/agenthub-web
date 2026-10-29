@@ -94,5 +94,7 @@ export async function exchangeCodeForToken(code: string, redirectUri: string): P
   });
   if (!res.ok) throw new Error(`GitHub token exchange failed with ${res.status}`);
   const data = await res.json();
+  // GitHub answers 200 with an error code, e.g. incorrect_client_credentials when the secret is wrong
+  if (typeof data.error === "string") throw new Error(`GitHub token exchange failed: ${data.error}`);
   return typeof data.access_token === "string" ? data.access_token : null;
 }
