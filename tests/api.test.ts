@@ -81,6 +81,16 @@ describe("AgentHub Web API", () => {
       const allProfiles = data.packages.every((p: Package) => p.type === "profile");
       expect(allProfiles).toBe(true);
     });
+
+    it("sorts newest first by default and by smallest footprint with ?sort=tokens", async () => {
+      const byDefault = await (await getPackages(new NextRequest("http://localhost:3000/api/packages"))).json();
+      const created = byDefault.packages.map((p: Package) => new Date(p.createdAt).getTime());
+      expect(created).toEqual([...created].sort((a, b) => b - a));
+
+      const byTokens = await (await getPackages(new NextRequest("http://localhost:3000/api/packages?sort=tokens"))).json();
+      const tokens = byTokens.packages.map((p: Package) => p.tokenFootprint);
+      expect(tokens).toEqual([...tokens].sort((a, b) => a - b));
+    });
   });
 
   describe("GET /api/packages/[owner]/[repo]", () => {

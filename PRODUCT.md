@@ -40,7 +40,7 @@ The registry shows what a package will put into the agent's context (token footp
 - The CLI runs a static scan (`../agenthub/src/core/security.ts`) when a package is published, and sends `securityRisk` and `isClean` to the registry.
   The registry stores what the publisher sends and does not re-run the scan, so the site must label it as a publish-time scan, never as registry verification.
 - `agenthub info` and `add` with an `owner/repo` target clone `https://github.com/owner/repo` and scan it locally; they do not read this registry.
-- Open: whether `agenthub search` queries this registry.
+- `agenthub search` queries this registry's `GET /api/packages` (`../agenthub/src/core/registry.ts`) without a `sort`, so the API default order is what CLI users see.
 
 ## Evidence on Hand
 

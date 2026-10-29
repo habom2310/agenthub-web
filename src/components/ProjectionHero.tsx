@@ -15,7 +15,7 @@ const STEPS = [
     text: (
       <>
         Pick a package from the{" "}
-        <a href="#registry" className="text-signal-soft underline underline-offset-4 hover:text-signal-soft">
+        <a href="#registry" className="text-signal-soft underline underline-offset-4 hover:text-signal">
           registry
         </a>
         . Inspect what it adds before you install it.
