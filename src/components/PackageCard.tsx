@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Star, Download, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Package } from "@/lib/db/schema";
 import { InstallPill } from "./InstallPill";
+import { getScanStatus } from "./SecurityBadge";
 
 interface PackageCardProps {
   pkg: Package;
@@ -15,6 +16,7 @@ export function PackageCard({ pkg }: PackageCardProps) {
     ? `agenthub profile use ${pkg.id}`
     : `agenthub add ${pkg.id}`;
 
+  const scanStatus = getScanStatus(pkg);
   const initial = pkg.owner.charAt(0).toUpperCase();
   const maxBudget = 2000;
   const tokenPct = Math.min(Math.round((pkg.tokenFootprint / maxBudget) * 100), 100);
@@ -48,8 +50,8 @@ export function PackageCard({ pkg }: PackageCardProps) {
             <div>
               <h3 className="text-sm font-bold text-[var(--foreground)] group-hover:text-indigo-400 transition-colors flex items-center space-x-1.5">
                 <span>{pkg.id}</span>
-                {pkg.isClean && (
-                  <span title="Verified setup">
+                {pkg.isClean && pkg.securityRisk === "low" && (
+                  <span title="Publish-time scan found no issues">
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                   </span>
                 )}
@@ -60,7 +62,7 @@ export function PackageCard({ pkg }: PackageCardProps) {
             </div>
           </Link>
           <span
-            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap flex-shrink-0 ${
               isProfile
                 ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
                 : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
@@ -94,12 +96,10 @@ export function PackageCard({ pkg }: PackageCardProps) {
               {pkg.mcpServers.length} MCP ({pkg.mcpServers[0].name})
             </span>
           )}
-          {pkg.securityRisk === "low" && (
-            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-medium flex items-center space-x-1">
-              <ShieldCheck className="w-3 h-3" />
-              <span>Clean</span>
-            </span>
-          )}
+          <span className={`px-2 py-0.5 rounded border text-[10px] font-medium flex items-center space-x-1 ${scanStatus.pill}`}>
+            <ShieldCheck className="w-3 h-3" />
+            <span>{scanStatus.label}</span>
+          </span>
         </div>
 
         {/* Token Budget Bar */}

@@ -20,7 +20,7 @@ export default function DocsPage() {
           Unified Configuration & Package Management for AI Agents
         </h1>
         <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-          The <code>agenthub</code> CLI allows engineers to discover, install, verify, and synchronize rule sets, domain skills, and MCP servers across Google Antigravity, Claude Code, Cursor, Windsurf, and Codex.
+          The <code>agenthub</code> CLI allows engineers to discover, install, inspect, and synchronize rule sets, domain skills, and MCP servers across Google Antigravity, Claude Code, Cursor, Windsurf, and Codex.
         </p>
       </div>
 
@@ -34,8 +34,8 @@ export default function DocsPage() {
           Run directly with <code>npx</code> without a global installation, or install globally via npm:
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <InstallPill command="npm install -g agenthub" />
-          <InstallPill command="npx agenthub info alice/nextjs-agent" />
+          <InstallPill command="npm install -g @habom2310/agenthub" />
+          <InstallPill command="npx @habom2310/agenthub setup" />
         </div>
       </div>
 
@@ -54,7 +54,7 @@ export default function DocsPage() {
             <div className="text-xs font-bold text-indigo-300"># Apply a turnkey profile to the current repository</div>
             <InstallPill command="agenthub profile use alice/nextjs-agent" />
             <p className="font-sans text-[11px] text-[var(--muted-foreground)] pt-1">
-              Downloads the package manifest, compiles rules AST, projects instructions to <code>GEMINI.md</code>, <code>CLAUDE.md</code>, and <code>.cursorrules</code>, and binds MCP servers.
+              Downloads the package manifest, compiles rules AST, projects instructions to <code>GEMINI.md</code>, <code>CLAUDE.md</code>, and Cursor rules (<code>agenthub.mdc</code>), and binds MCP servers.
             </p>
           </div>
 
@@ -64,8 +64,9 @@ export default function DocsPage() {
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Switch between active profiles</div>
-            <InstallPill command="agenthub profile switch python-dev/fastapi-agent" />
+            <div className="text-xs font-bold text-indigo-300"># Create a local profile, then switch to it</div>
+            <InstallPill command="agenthub profile create work" />
+            <InstallPill command="agenthub profile use work" />
           </div>
         </div>
       </section>
@@ -100,19 +101,11 @@ export default function DocsPage() {
           <h2 className="text-base font-bold text-slate-100">agenthub info</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Inspect a package before installing. Performs static verification, displays token budget calculations, and checks for unsafe command flags or secret leakages.
+          Inspect a package before installing. Runs a static scan and shows the risk level, scan warnings, MCP server commands, scripts, required environment variables and token footprint.
         </p>
 
         <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-          <InstallPill command="agenthub info rust-lang/cargo-agent --verbose" />
-          <div className="pt-2">
-            <div className="text-[11px] font-sans font-semibold text-slate-300 mb-1.5">Common Flags:</div>
-            <ul className="list-disc pl-5 space-y-1 text-[var(--muted-foreground)] font-sans text-[11px]">
-              <li><code>--verbose</code>: Show full AST rule breakdown and individual token costs.</li>
-              <li><code>--json</code>: Output parsed manifest in JSON format for automated CI gates.</li>
-              <li><code>--audit-only</code>: Return exit code non-zero if security risks or secret leaks are found.</li>
-            </ul>
-          </div>
+          <InstallPill command="agenthub info rust-lang/cargo-agent" />
         </div>
       </section>
 
@@ -120,7 +113,7 @@ export default function DocsPage() {
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
           <Cpu className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-base font-bold text-slate-100">agenthub share & publish</h2>
+          <h2 className="text-base font-bold text-slate-100">agenthub share</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Share your custom agent configurations with your team or publish open-source setups to the public AgentHub registry.
@@ -128,13 +121,13 @@ export default function DocsPage() {
 
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Generate an agenthub.json manifest from your local directory</div>
-            <InstallPill command="agenthub init" />
+            <div className="text-xs font-bold text-indigo-300"># Push your hub config to its Git remote</div>
+            <InstallPill command='agenthub share -m "Update team engineering rules"' />
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Publish your setup to the registry</div>
-            <InstallPill command="agenthub publish" />
+            <div className="text-xs font-bold text-indigo-300"># Push and publish your setup to the registry</div>
+            <InstallPill command="agenthub share --publish" />
           </div>
         </div>
       </section>
@@ -146,7 +139,7 @@ export default function DocsPage() {
           <span>How AgentHub Projections Work Under the Hood</span>
         </h2>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Each assistant platform reads rules from distinct locations: Antigravity reads <code>GEMINI.md</code>, Claude Code reads <code>CLAUDE.md</code>, Cursor reads <code>.cursorrules</code>, and Codex reads custom system directives.
+          Each assistant platform reads rules from distinct locations: Antigravity reads <code>GEMINI.md</code>, Claude Code reads <code>CLAUDE.md</code>, Cursor reads <code>agenthub.mdc</code>, and Codex reads <code>AGENTS.md</code>.
         </p>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Instead of maintaining duplicate Markdown files that drift over time, AgentHub stores rules as an <strong>AST (Abstract Syntax Tree)</strong>. When you install or switch profiles, AgentHub compiles and projects the rules with assistant-specific optimizations, token budgets, and override sections.

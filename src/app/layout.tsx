@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "AgentHub | The Open Registry for AI Coding Agents",
-  description: "Discover, share, and reuse vetted AI agent setups, rules, skills, and MCP connectors for Google Antigravity, Claude Code, Cursor, and Codex.",
+  description: "Discover, share, and reuse AI agent setups, rules, skills, and MCP connectors for Google Antigravity, Claude Code, Cursor, and Codex.",
 };
 
 export default function RootLayout({

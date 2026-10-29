@@ -95,7 +95,7 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
             <span>The Open Registry for AI Coding Agents</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--foreground)]">
-            Discover, share, and reuse vetted AI agent setups.
+            Discover, share, and reuse AI agent setups.
           </h1>
           <p className="text-xs sm:text-sm text-[var(--muted-foreground)] leading-relaxed">
             Explore ready-to-run multi-agent configurations, custom rules AST, domain skills, and MCP connectors for Google Antigravity, Claude Code, Cursor, Windsurf, and Codex.
@@ -104,7 +104,7 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
             <span className="text-[var(--muted-foreground)] self-center font-medium">Quick CLI try:</span>
             <div className="inline-flex items-center space-x-2 bg-[var(--background)]/80 border border-[var(--border)] rounded-lg px-3 py-1 font-mono text-xs text-indigo-300">
               <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-              <span>npx agenthub profile use alice/nextjs-agent</span>
+              <span>npx @habom2310/agenthub profile use alice/nextjs-agent</span>
             </div>
             <Link
               href="/docs"
@@ -123,7 +123,7 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
       <div className="flex items-center justify-between text-xs text-[var(--muted-foreground)]">
         <div>
           Showing <span className="font-semibold text-slate-200">{filteredPackages.length}</span> of{" "}
-          <span className="font-semibold text-slate-200">{initialPackages.length}</span> verified setups
+          <span className="font-semibold text-slate-200">{initialPackages.length}</span> setups
         </div>
         {(filters.search || filters.platform !== "all" || filters.type !== "all" || filters.tag) && (
           <button

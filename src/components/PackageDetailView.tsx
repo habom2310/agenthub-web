@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Package } from "@/lib/db/schema";
 import { AstRuleViewer } from "./AstRuleViewer";
 import { McpVisualizer } from "./McpVisualizer";
-import { SecurityBadge } from "./SecurityBadge";
+import { SecurityBadge, getScanStatus } from "./SecurityBadge";
 import { InstallPill } from "./InstallPill";
 import {
   Star,
@@ -269,8 +269,8 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
           }`}
         >
           <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Security Audit</span>
-          <span className="text-emerald-400 font-bold text-[10px]">✓ Pass</span>
+          <span>Security Scan</span>
+          <span className={`font-bold text-[10px] ${getScanStatus(pkg).text}`}>{getScanStatus(pkg).label}</span>
         </button>
 
         <button
@@ -461,7 +461,7 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
       {/* TAB 4: MCP CONNECTORS */}
       {activeTab === "mcp" && <McpVisualizer servers={pkg.mcpServers} />}
 
-      {/* TAB 5: SECURITY AUDIT */}
+      {/* TAB 5: SECURITY SCAN */}
       {activeTab === "security" && <SecurityBadge pkg={pkg} />}
 
       {/* TAB 6: MANIFEST JSON */}
@@ -474,7 +474,7 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
                 <span>agenthub.json Manifest</span>
               </h3>
               <p className="text-[var(--muted-foreground)] text-[11px] mt-0.5">
-                Exact registry descriptor parsed by AgentHub CLI during install and sync
+                Registry record for this package, as sent by the publisher
               </p>
             </div>
             <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono">

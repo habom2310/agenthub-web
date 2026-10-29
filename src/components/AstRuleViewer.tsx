@@ -53,7 +53,7 @@ export function AstRuleViewer({ rules }: AstRuleViewerProps) {
             <span>Markdown AST Rules Projection</span>
           </h3>
           <p className="text-[var(--muted-foreground)] text-[11px] mt-0.5">
-            Compiled and projected into GEMINI.md, CLAUDE.md, and .cursorrules
+            Compiled and projected into GEMINI.md, CLAUDE.md, AGENTS.md, and Cursor rules
           </p>
         </div>
         <div className="flex items-center space-x-3">
