@@ -8,6 +8,10 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // Public OAuth App id (dashboard text vars are wiped by each deploy). GITHUB_CLIENT_SECRET is a Cloudflare secret.
+  "vars": {
+    "GITHUB_CLIENT_ID": "Ov23li1sYIWxaWE2NBwq"
+  },
   "d1_databases": [
     {
       "binding": "DB",
