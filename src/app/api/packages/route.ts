@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, initDb } from "@/lib/db";
 import { packages, Package } from "@/lib/db/schema";
-import { desc, asc, like, or } from "drizzle-orm";
+import { matchesSearch } from "@/lib/catalog";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,16 +16,9 @@ export async function GET(request: NextRequest) {
 
     let allPackages: Package[] = await db.select().from(packages);
 
-    // Filter by query (name, id, description, tags)
+    // Same word-prefix search as the site, so the CLI and the web return the same matches
     if (q) {
-      allPackages = allPackages.filter((pkg) => {
-        return (
-          pkg.id.toLowerCase().includes(q) ||
-          pkg.name.toLowerCase().includes(q) ||
-          pkg.description.toLowerCase().includes(q) ||
-          pkg.tags.some((t) => t.toLowerCase().includes(q))
-        );
-      });
+      allPackages = allPackages.filter((pkg) => matchesSearch(pkg, q));
     }
 
     // Filter by platform

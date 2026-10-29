@@ -39,6 +39,13 @@ describe("AgentHub Web API", () => {
       expect(ids).toContain("alice/nextjs-agent");
     });
 
+    it("matches word prefixes, so ?q=rust does not hit \"trust\"", async () => {
+      const data = await (await getPackages(new NextRequest("http://localhost:3000/api/packages?q=rust"))).json();
+      const ids = data.packages.map((p: Package) => p.id);
+      expect(ids).toContain("rust-lang/cargo-agent");
+      expect(ids).not.toContain("security/agent-harden");
+    });
+
     it("filters by keyword search ?q=nextjs", async () => {
       const req = new NextRequest("http://localhost:3000/api/packages?q=nextjs");
       const res = await getPackages(req);
