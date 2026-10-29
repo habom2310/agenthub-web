@@ -106,38 +106,74 @@ export default function DocsPage() {
         </div>
       </section>
 
-      {/* COMMAND 4: agenthub share / publish */}
+      {/* COMMAND 4: sharing your setup */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
           <Cpu className="w-4 h-4 text-signal" />
-          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub share</h2>
+          <h2 className="text-base font-bold text-[var(--foreground)]">Share your setup: agenthub share</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Share your custom agent configurations with your team or publish open-source setups to the public AgentHub registry.
+          Push your hub to a GitHub repo so your team or your other machines can install it, then optionally publish it to this registry so anyone can find it.
         </p>
 
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-signal-soft"># Push your hub config to its Git remote</div>
-            <InstallPill command='agenthub share -m "Update team engineering rules"' />
-          </div>
-
-          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-signal-soft"># Push and publish your setup to the registry</div>
-            <InstallPill command="agenthub share --publish" />
+            <div className="text-xs font-bold text-signal-soft"># 1. Create an empty public GitHub repo</div>
+            <InstallPill command="gh repo create my-agent-setup --public" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
-              Publishes as your GitHub account. The repo must be a public GitHub repo you can push to. Run <code>agenthub login</code> first.
+              Leave it empty (no README or license), or the first push is rejected. It must be public to be listed in the registry.
             </p>
           </div>
-
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-signal-soft"># Remove a package you published</div>
-            <InstallPill command="agenthub unpublish owner/repo" />
+            <div className="text-xs font-bold text-signal-soft"># 2. Connect your hub to it</div>
+            <InstallPill command="agenthub git init --remote-url https://github.com/<you>/my-agent-setup.git" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
-              Allowed for the account that published it. From the CLI, anyone with push access to the repo can also unpublish it.
+              Runs <code>git init</code> in <code>~/.agenthub</code>, sets <code>origin</code>, and writes a <code>.gitignore</code> that keeps <code>backups/</code> and <code>.env</code> files out.
+            </p>
+          </div>
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># 3. Describe your package (optional)</div>
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Add <code>name</code>, <code>description</code>, <code>type</code> (<code>profile</code> for a whole setup, <code>addon</code> for a few rules or skills), <code>tags</code> and <code>license</code> to <code>~/.agenthub/agenthub.json</code>. Missing fields default to the repo name, <code>profile</code> and <code>MIT</code>. A <code>README.md</code> in the hub becomes your package page.
+            </p>
+          </div>
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># 4. Check what you are about to share</div>
+            <InstallPill command="agenthub budget" />
+            <InstallPill command="agenthub info ~/.agenthub" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              <code>share</code> stops on hard-coded keys in skill or <code>scripts/</code> files and on high-risk scripts or MCP servers. It does not scan <code>rules/</code> or <code>mcp/servers.json</code>, so check those for pasted keys yourself.
+            </p>
+          </div>
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># 5. Push to Git</div>
+            <InstallPill command='agenthub share -m "First version of my setup"' />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Prints <code>agenthub add &lt;you&gt;/my-agent-setup</code> for your team or other machines. Stop here if you do not want a public listing.
+            </p>
+          </div>
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># 6. Publish to the registry</div>
+            <InstallPill command="agenthub login" />
+            <InstallPill command="agenthub share --publish" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Publishes as your GitHub account, which needs push access to the repo. Your package appears at <code>/packages/&lt;you&gt;/my-agent-setup</code> and in <code>agenthub search</code>.
+            </p>
+          </div>
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># 7. Update or remove it later</div>
+            <InstallPill command='agenthub share --publish -m "Add Go rules"' />
+            <InstallPill command="agenthub unpublish <you>/my-agent-setup" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Publishing again refreshes the listing and keeps its stars and installs. <code>unpublish</code> removes the listing only; your Git repo stays. The account that published it, or anyone with push access to the repo, can unpublish.
             </p>
           </div>
         </div>
+
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Others install your package with <code>agenthub add &lt;you&gt;/my-agent-setup</code>, or switch to it as a whole profile with <code>agenthub profile use &lt;you&gt;/my-agent-setup</code>. For error messages and fixes, see the 
+          <a href="https://github.com/habom2310/agenthub#6-sharing--publishing" className="text-signal-soft hover:text-signal" target="_blank" rel="noopener noreferrer">full sharing guide</a>.
+        </p>
       </section>
 
       {/* COMMAND 5: login, whoami, logout */}
