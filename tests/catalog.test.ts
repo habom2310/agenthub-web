@@ -103,5 +103,6 @@ describe("registryNote", () => {
 
   it("shows no note without demo packages", () => {
     expect(registryNote(["bob/real"])).toBeNull();
+    expect(registryNote([])).toBeNull();
   });
 });
