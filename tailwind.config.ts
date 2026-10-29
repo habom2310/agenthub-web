@@ -35,6 +35,7 @@ const config: Config = {
           DEFAULT: "var(--accent)",
           foreground: "var(--accent-foreground)",
         },
+        signal: { DEFAULT: "#ff6a1a", soft: "#ffa06b" },
         border: "var(--border)",
         ring: "var(--ring)",
       },

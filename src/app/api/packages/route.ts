@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, initDb } from "@/lib/db";
 import { packages, Package } from "@/lib/db/schema";
-import { desc, asc, like, or } from "drizzle-orm";
+import { matchesSearch } from "@/lib/catalog";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,20 +12,13 @@ export async function GET(request: NextRequest) {
     const platform = (searchParams.get("platform") || "").toLowerCase().trim();
     const type = (searchParams.get("type") || "").toLowerCase().trim();
     const tag = (searchParams.get("tag") || "").toLowerCase().trim();
-    const sort = (searchParams.get("sort") || "stars").toLowerCase().trim();
+    const sort = (searchParams.get("sort") || "recent").toLowerCase().trim();
 
     let allPackages: Package[] = await db.select().from(packages);
 
-    // Filter by query (name, id, description, tags)
+    // Same word-prefix search as the site, so the CLI and the web return the same matches
     if (q) {
-      allPackages = allPackages.filter((pkg) => {
-        return (
-          pkg.id.toLowerCase().includes(q) ||
-          pkg.name.toLowerCase().includes(q) ||
-          pkg.description.toLowerCase().includes(q) ||
-          pkg.tags.some((t) => t.toLowerCase().includes(q))
-        );
-      });
+      allPackages = allPackages.filter((pkg) => matchesSearch(pkg, q));
     }
 
     // Filter by platform
@@ -53,11 +46,11 @@ export async function GET(request: NextRequest) {
         return b.installCount - a.installCount;
       } else if (sort === "tokens") {
         return a.tokenFootprint - b.tokenFootprint;
-      } else if (sort === "recent") {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      } else {
-        // default: stars
+      } else if (sort === "stars") {
         return b.stars - a.stars;
+      } else {
+        // Default: newest first. Stars and installs are not measured yet, so they are opt-in only.
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
 

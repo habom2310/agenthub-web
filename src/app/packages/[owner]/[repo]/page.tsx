@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${pkg.name} (${pkg.id}) | AgentHub Inspector`,
+    title: `${pkg.name} (${pkg.id}) | AgentHub`,
     description: pkg.description,
   };
 }

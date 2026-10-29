@@ -39,6 +39,13 @@ describe("AgentHub Web API", () => {
       expect(ids).toContain("alice/nextjs-agent");
     });
 
+    it("matches word prefixes, so ?q=rust does not hit \"trust\"", async () => {
+      const data = await (await getPackages(new NextRequest("http://localhost:3000/api/packages?q=rust"))).json();
+      const ids = data.packages.map((p: Package) => p.id);
+      expect(ids).toContain("rust-lang/cargo-agent");
+      expect(ids).not.toContain("security/agent-harden");
+    });
+
     it("filters by keyword search ?q=nextjs", async () => {
       const req = new NextRequest("http://localhost:3000/api/packages?q=nextjs");
       const res = await getPackages(req);
@@ -80,6 +87,16 @@ describe("AgentHub Web API", () => {
       expect(data.packages.length).toBeGreaterThan(0);
       const allProfiles = data.packages.every((p: Package) => p.type === "profile");
       expect(allProfiles).toBe(true);
+    });
+
+    it("sorts newest first by default and by smallest footprint with ?sort=tokens", async () => {
+      const byDefault = await (await getPackages(new NextRequest("http://localhost:3000/api/packages"))).json();
+      const created = byDefault.packages.map((p: Package) => new Date(p.createdAt).getTime());
+      expect(created).toEqual([...created].sort((a, b) => b - a));
+
+      const byTokens = await (await getPackages(new NextRequest("http://localhost:3000/api/packages?sort=tokens"))).json();
+      const tokens = byTokens.packages.map((p: Package) => p.tokenFootprint);
+      expect(tokens).toEqual([...tokens].sort((a, b) => a - b));
     });
   });
 
