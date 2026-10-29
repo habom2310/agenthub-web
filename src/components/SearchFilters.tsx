@@ -1,152 +1,126 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface FilterState {
-  search: string;
-  platform: string;
-  type: string;
-  tag: string;
-  sortBy: string;
-}
+import { ASSISTANT_LABELS, type FilterState } from "@/lib/catalog";
 
 interface SearchFiltersProps {
   filters: FilterState;
-  onChange: (filters: FilterState) => void;
+  onChange: (filters: FilterState, replace?: boolean) => void;
 }
 
-export const PLATFORMS = [
-  { id: "all", label: "All Assistants", color: "bg-indigo-500" },
-  { id: "gemini", label: "Antigravity (Gemini)", color: "bg-blue-500" },
-  { id: "claude", label: "Claude Code", color: "bg-orange-500" },
-  { id: "cursor", label: "Cursor", color: "bg-emerald-500" },
-  { id: "windsurf", label: "Windsurf", color: "bg-cyan-500" },
-  { id: "codex", label: "Codex", color: "bg-violet-500" },
+const PLATFORMS = [
+  { id: "all", label: "All assistants" },
+  ...Object.entries(ASSISTANT_LABELS).map(([id, label]) => ({ id, label })),
 ];
 
-export const TYPES = [
-  { id: "all", label: "All Types" },
-  { id: "profile", label: "Full Profiles" },
-  { id: "addon", label: "Modular Addons" },
+const TYPES = [
+  { id: "all", label: "All" },
+  { id: "profile", label: "Profiles" },
+  { id: "addon", label: "Add-ons" },
 ];
 
-export const POPULAR_TAGS = [
-  "nextjs",
-  "security",
-  "python",
-  "fastapi",
-  "rust",
-  "gcp",
-  "duckdb",
-  "playwright",
+const SORTS = [
+  { id: "recent", label: "Recently added" },
+  { id: "tokens", label: "Smallest context" },
 ];
+
+const selectClass =
+  "h-10 md:h-9 bg-[var(--card)] border border-[var(--border)] rounded-lg px-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]";
 
 export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
-  const setPlatform = (platform: string) => {
-    onChange({ ...filters, platform });
-  };
-
-  const setType = (type: string) => {
-    onChange({ ...filters, type });
-  };
-
-  const toggleTag = (tag: string) => {
-    onChange({ ...filters, tag: filters.tag === tag ? "" : tag });
-  };
-
-  const setSortBy = (sortBy: string) => {
-    onChange({ ...filters, sortBy });
-  };
+  // Below md the controls collapse behind a toggle so results stay near the top
+  const [open, setOpen] = useState(false);
+  // Local text keeps typing responsive; the URL catches up via replaceState
+  const [text, setText] = useState(filters.search);
+  useEffect(() => setText(filters.search), [filters.search]);
+  const activeCount = [filters.platform !== "all", filters.type !== "all", filters.sortBy !== "recent"].filter(Boolean).length;
 
   return (
-    <div className="space-y-4">
-      {/* Popular Tag Chips */}
-      <div className="flex flex-wrap items-center gap-2 text-xs">
-        <span className="text-[var(--muted-foreground)] self-center font-medium">Quick Tags:</span>
-        {POPULAR_TAGS.map((tag) => {
-          const active = filters.tag === tag;
-          return (
-            <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg border transition-all text-xs font-mono",
-                active
-                  ? "bg-indigo-600 text-white border-indigo-500 shadow-sm"
-                  : "bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border-[var(--border)] hover:border-indigo-500/40"
-              )}
-            >
-              #{tag}
-            </button>
-          );
-        })}
-        {filters.tag && (
-          <button
-            onClick={() => onChange({ ...filters, tag: "" })}
-            className="text-xs text-rose-400 hover:underline ml-1"
-          >
-            Clear tag
-          </button>
-        )}
+    <div className="space-y-3">
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]" />
+        <input
+          type="search"
+          aria-label="Search packages by name, description or tag"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            // Replace the history entry instead of adding one per keystroke
+            onChange({ ...filters, search: e.target.value }, true);
+          }}
+          placeholder="Search by name, description or tag"
+          className="w-full h-10 bg-[var(--card)] border border-[var(--border)] rounded-lg pl-9 pr-3 text-base md:text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        />
       </div>
 
-      {/* Main Filter Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border)] pb-4">
-        {/* Assistant Filter Pills */}
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 max-w-full">
-          {PLATFORMS.map((p) => {
-            const active = filters.platform === p.id;
-            return (
-              <button
-                key={p.id}
-                onClick={() => setPlatform(p.id)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 whitespace-nowrap flex-shrink-0",
-                  active
-                    ? "bg-[var(--primary)] text-[var(--primary-foreground)] shadow-sm font-semibold"
-                    : "bg-[var(--card)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--border)] hover:border-slate-600"
-                )}
-              >
-                {p.id !== "all" && <span className={cn("w-2 h-2 rounded-full", p.color)} />}
-                <span>{p.label}</span>
-              </button>
-            );
-          })}
-        </div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls="catalog-filters"
+        className="md:hidden w-full h-11 flex items-center justify-between px-3 rounded-lg border border-[var(--border)] bg-[var(--card)] text-sm text-[var(--foreground)]"
+      >
+        <span className="flex items-center gap-2">
+          <SlidersHorizontal className="w-4 h-4 text-[var(--muted-foreground)]" />
+          Filters and sort
+        </span>
+        {activeCount > 0 && <span className="text-xs text-signal-soft">{activeCount} active</span>}
+      </button>
 
-        {/* Type & Sorting Options */}
-        <div className="flex items-center space-x-3 text-xs text-[var(--muted-foreground)] flex-shrink-0">
-          <div className="flex items-center space-x-1 bg-[var(--card)] border border-[var(--border)] rounded-lg p-0.5">
-            {TYPES.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setType(t.id)}
-                className={cn(
-                  "px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
-                  filters.type === t.id
-                    ? "bg-[var(--primary)] text-white"
-                    : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
-                )}
-              >
-                {t.label}
-              </button>
+      <div
+        id="catalog-filters"
+        className={cn("flex-wrap items-center gap-3 text-sm text-[var(--muted-foreground)] md:flex", open ? "flex" : "hidden")}
+      >
+        <label className="flex items-center gap-2">
+          <span>Assistant</span>
+          <select
+            value={filters.platform}
+            onChange={(e) => onChange({ ...filters, platform: e.target.value })}
+            className={selectClass}
+          >
+            {PLATFORMS.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.label}
+              </option>
             ))}
-          </div>
+          </select>
+        </label>
 
-          <div className="flex items-center space-x-1.5">
-            <span>Sort:</span>
-            <select
-              value={filters.sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-2.5 py-1 text-xs text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        <div role="group" aria-label="Package type" className="flex items-center gap-0.5 bg-[var(--card)] border border-[var(--border)] rounded-lg p-0.5">
+          {TYPES.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              aria-pressed={filters.type === t.id}
+              onClick={() => onChange({ ...filters, type: t.id })}
+              className={cn(
+                "h-9 md:h-8 px-3 rounded-md transition-colors",
+                filters.type === t.id
+                  ? "bg-[var(--secondary)] text-[var(--foreground)] font-medium"
+                  : "hover:text-[var(--foreground)]"
+              )}
             >
-              <option value="stars">Most Stars</option>
-              <option value="installs">Most Installs</option>
-              <option value="tokens">Lowest Tokens</option>
-              <option value="recent">Recently Added</option>
-            </select>
-          </div>
+              {t.label}
+            </button>
+          ))}
         </div>
+
+        <label className="flex items-center gap-2 md:ml-auto">
+          <span>Sort</span>
+          <select
+            value={filters.sortBy}
+            onChange={(e) => onChange({ ...filters, sortBy: e.target.value })}
+            className={selectClass}
+          >
+            {SORTS.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
     </div>
   );
