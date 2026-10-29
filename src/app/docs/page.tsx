@@ -1,4 +1,4 @@
-import { Terminal, Shield, Sparkles, Layers, BookOpen, Cpu, CheckCircle2 } from "lucide-react";
+import { Terminal, Shield, Layers, Cpu, CheckCircle2 } from "lucide-react";
 import { InstallPill } from "@/components/InstallPill";
 import type { Metadata } from "next";
 
@@ -12,10 +12,6 @@ export default function DocsPage() {
     <div className="max-w-4xl mx-auto space-y-10 text-xs">
       {/* Docs Header */}
       <div className="border-b border-[var(--border)] pb-6 space-y-3">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>AgentHub CLI Reference & Architecture Guide</span>
-        </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--foreground)] tracking-tight">
           Unified Configuration & Package Management for AI Agents
         </h1>
@@ -26,8 +22,8 @@ export default function DocsPage() {
 
       {/* Quick Start Card */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 space-y-4">
-        <h2 className="text-sm font-bold text-slate-200 flex items-center space-x-2">
-          <Sparkles className="w-4 h-4 text-indigo-400" />
+        <h2 className="text-sm font-bold text-[var(--foreground)] flex items-center space-x-2">
+          <Terminal className="w-4 h-4 text-signal" />
           <span>Quick Start: Instant CLI Usage</span>
         </h2>
         <p className="text-[var(--muted-foreground)]">
@@ -42,29 +38,29 @@ export default function DocsPage() {
       {/* COMMAND 1: agenthub profile */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
-          <Terminal className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-base font-bold text-slate-100">agenthub profile</h2>
+          <Terminal className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub profile</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Manage complete, turnkey agent configurations. A profile sets your baseline rules, agent roles, subagent workflows, and default toolings.
+          Manage complete agent configurations. A profile sets your baseline rules, agent roles, subagent workflows, and default toolings.
         </p>
 
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Apply a turnkey profile to the current repository</div>
+            <div className="text-xs font-bold text-signal-soft"># Switch your hub to a profile from the registry</div>
             <InstallPill command="agenthub profile use alice/nextjs-agent" />
-            <p className="font-sans text-[11px] text-[var(--muted-foreground)] pt-1">
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
               Downloads the package manifest, compiles rules AST, projects instructions to <code>GEMINI.md</code>, <code>CLAUDE.md</code>, and Cursor rules (<code>agenthub.mdc</code>), and binds MCP servers.
             </p>
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># List installed profiles</div>
+            <div className="text-xs font-bold text-signal-soft"># List installed profiles</div>
             <InstallPill command="agenthub profile list" />
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Create a local profile, then switch to it</div>
+            <div className="text-xs font-bold text-signal-soft"># Create a local profile, then switch to it</div>
             <InstallPill command="agenthub profile create work" />
             <InstallPill command="agenthub profile use work" />
           </div>
@@ -74,8 +70,8 @@ export default function DocsPage() {
       {/* COMMAND 2: agenthub add */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
-          <Layers className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-base font-bold text-slate-100">agenthub add</h2>
+          <Layers className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub add</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Add modular add-ons (individual rule packs, domain skills, or MCP connectors) into an existing setup without overwriting your baseline configuration.
@@ -83,12 +79,12 @@ export default function DocsPage() {
 
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Install zero-trust security rules</div>
+            <div className="text-xs font-bold text-signal-soft"># Install zero-trust security rules</div>
             <InstallPill command="agenthub add security/agent-harden" />
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Add DuckDB analytics skills and MCP</div>
+            <div className="text-xs font-bold text-signal-soft"># Add DuckDB analytics skills and MCP</div>
             <InstallPill command="agenthub add data/duckdb-analytics" />
           </div>
         </div>
@@ -97,8 +93,8 @@ export default function DocsPage() {
       {/* COMMAND 3: agenthub info */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
-          <Shield className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-base font-bold text-slate-100">agenthub info</h2>
+          <Shield className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub info</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Inspect a package before installing. Runs a static scan and shows the risk level, scan warnings, MCP server commands, scripts, required environment variables and token footprint.
@@ -112,8 +108,8 @@ export default function DocsPage() {
       {/* COMMAND 4: agenthub share / publish */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
-          <Cpu className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-base font-bold text-slate-100">agenthub share</h2>
+          <Cpu className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub share</h2>
         </div>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Share your custom agent configurations with your team or publish open-source setups to the public AgentHub registry.
@@ -121,12 +117,12 @@ export default function DocsPage() {
 
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Push your hub config to its Git remote</div>
+            <div className="text-xs font-bold text-signal-soft"># Push your hub config to its Git remote</div>
             <InstallPill command='agenthub share -m "Update team engineering rules"' />
           </div>
 
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
-            <div className="text-xs font-bold text-indigo-300"># Push and publish your setup to the registry</div>
+            <div className="text-xs font-bold text-signal-soft"># Push and publish your setup to the registry</div>
             <InstallPill command="agenthub share --publish" />
           </div>
         </div>
@@ -134,8 +130,8 @@ export default function DocsPage() {
 
       {/* ARCHITECTURE: The AST Rule Compiler */}
       <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 space-y-4">
-        <h2 className="text-base font-bold text-slate-100 flex items-center space-x-2">
-          <Layers className="w-4 h-4 text-indigo-400" />
+        <h2 className="text-base font-bold text-[var(--foreground)] flex items-center space-x-2">
+          <Layers className="w-4 h-4 text-signal" />
           <span>How AgentHub Projections Work Under the Hood</span>
         </h2>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
@@ -145,7 +141,7 @@ export default function DocsPage() {
           Instead of maintaining duplicate Markdown files that drift over time, AgentHub stores rules as an <strong>AST (Abstract Syntax Tree)</strong>. When you install or switch profiles, AgentHub compiles and projects the rules with assistant-specific optimizations, token budgets, and override sections.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-[11px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
           <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg space-y-1">
             <div className="font-bold text-emerald-400 flex items-center space-x-1.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -156,7 +152,7 @@ export default function DocsPage() {
             </p>
           </div>
           <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg space-y-1">
-            <div className="font-bold text-indigo-400 flex items-center space-x-1.5">
+            <div className="font-bold text-signal flex items-center space-x-1.5">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Token Budget Gating</span>
             </div>

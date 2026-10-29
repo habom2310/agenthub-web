@@ -54,7 +54,7 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
             <StatusIcon className={`w-4 h-4 ${status.text}`} />
             <span>Publish-Time Security Scan</span>
           </h3>
-          <p className="text-[var(--muted-foreground)] text-[11px] mt-0.5">
+          <p className="text-[var(--muted-foreground)] text-xs mt-0.5">
             Static scan run by the AgentHub CLI when this package was published. The registry stores the result and does not re-run it.
           </p>
         </div>
@@ -69,12 +69,12 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Overall Risk */}
         <div className="p-4 border border-[var(--border)] rounded-lg bg-[var(--background)] space-y-2">
-          <span className="text-[11px] text-[var(--muted-foreground)] flex items-center space-x-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="text-xs text-[var(--muted-foreground)] flex items-center space-x-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-signal" />
             <span>Overall Risk</span>
           </span>
           <div className={`text-sm font-bold capitalize ${status.text}`}>{pkg.securityRisk}</div>
-          <p className="text-[10px] text-[var(--muted-foreground)] leading-relaxed">
+          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
             {pkg.isClean
               ? "The scan reported no warnings for MCP commands, scripts or embedded secrets."
               : "The scan reported warnings. Run the command below to see them before installing."}
@@ -83,15 +83,15 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
 
         {/* MCP Servers */}
         <div className="p-4 border border-[var(--border)] rounded-lg bg-[var(--background)] space-y-2">
-          <span className="text-[11px] text-[var(--muted-foreground)] flex items-center space-x-1">
-            <Server className="w-3.5 h-3.5 text-indigo-400" />
+          <span className="text-xs text-[var(--muted-foreground)] flex items-center space-x-1">
+            <Server className="w-3.5 h-3.5 text-signal" />
             <span>MCP Servers</span>
           </span>
           <div className="text-sm font-bold text-[var(--foreground)]">
             {pkg.mcpServers.length === 0 ? "None" : `${pkg.mcpServers.length} declared`}
           </div>
           {riskyServers.length > 0 ? (
-            <ul className="space-y-1 text-[10px]">
+            <ul className="space-y-1 text-xs">
               {riskyServers.map((s) => (
                 <li key={s.name} className="flex items-center justify-between gap-2">
                   <span className="font-mono truncate">{s.name}</span>
@@ -100,7 +100,7 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
               ))}
             </ul>
           ) : (
-            <p className="text-[10px] text-[var(--muted-foreground)] leading-relaxed">
+            <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
               {pkg.mcpServers.length === 0 ? "This package starts no MCP servers." : "All declared servers were rated low risk."}
             </p>
           )}
@@ -109,18 +109,18 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
         {/* Boot Context Budget */}
         <div className="p-4 border border-[var(--border)] rounded-lg bg-[var(--background)] space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-[var(--muted-foreground)] flex items-center space-x-1">
-              <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Boot Context Footprint</span>
+            <span className="text-xs text-[var(--muted-foreground)] flex items-center space-x-1">
+              <Cpu className="w-3.5 h-3.5 text-signal" />
+              <span>Context Added at Startup</span>
             </span>
-            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${budgetTone.pill}`}>
+            <span className={`text-xs font-mono px-1.5 py-0.5 rounded border ${budgetTone.pill}`}>
               {pct}%
             </span>
           </div>
           <div className={`text-sm font-bold ${budgetTone.text}`}>
-            {pkg.tokenFootprint.toLocaleString()} / {maxTokens.toLocaleString()} tk
+            {pkg.tokenFootprint.toLocaleString()} of {maxTokens.toLocaleString()} tokens
           </div>
-          <p className="text-[10px] text-[var(--muted-foreground)] leading-relaxed">
+          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
             {isBudgetOk
               ? "Within the 2,000-token boot context budget. Leaves headroom for large task prompts."
               : "Exceeds the 2,000-token boot target. Recommended for large-window LLMs only."}
@@ -130,11 +130,11 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
 
       {/* Re-run locally */}
       <div className="p-4 border border-[var(--border)] rounded-lg bg-[var(--background)] space-y-2">
-        <h4 className="text-xs font-semibold text-slate-200 flex items-center space-x-1.5">
-          <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+        <h4 className="text-xs font-semibold text-[var(--foreground)] flex items-center space-x-1.5">
+          <Terminal className="w-3.5 h-3.5 text-signal" />
           <span>Re-run the scan yourself before installing</span>
         </h4>
-        <p className="text-[11px] text-[var(--muted-foreground)]">
+        <p className="text-xs text-[var(--muted-foreground)]">
           Shows the full warning list, MCP commands, scripts and required environment variables.
         </p>
         <InstallPill command={`agenthub info ${pkg.id}`} />
