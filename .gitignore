@@ -48,3 +48,4 @@ next-env.d.ts
 
 # Cloudflare local secrets
 .dev.vars*
+.prod.vars*
