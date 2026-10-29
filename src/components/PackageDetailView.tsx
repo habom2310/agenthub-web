@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Package } from "@/lib/db/schema";
+import { PublicPackage } from "@/lib/db/schema";
 import { AstRuleViewer } from "./AstRuleViewer";
 import { McpVisualizer } from "./McpVisualizer";
 import { SecurityBadge, getScanStatus } from "./SecurityBadge";
@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 interface PackageDetailViewProps {
-  pkg: Package;
+  pkg: PublicPackage;
 }
 
 const TABS = ["overview", "rules", "skills", "mcp", "security", "manifest"] as const;
@@ -116,6 +116,22 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
           <p className="text-sm text-[var(--muted-foreground)] mt-1.5 max-w-3xl text-pretty">
             {pkg.description}
           </p>
+          {pkg.publisher && (
+            <p className="text-xs text-[var(--muted-foreground)] mt-2 flex items-center gap-1.5">
+              <span>Published by</span>
+              {pkg.publisher.avatarUrl && (
+                <img src={pkg.publisher.avatarUrl} alt="" width={16} height={16} className="w-4 h-4 rounded-full" />
+              )}
+              <a
+                href={`https://github.com/${pkg.publisher.login}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-[var(--foreground)] hover:text-signal"
+              >
+                @{pkg.publisher.login}
+              </a>
+            </p>
+          )}
           {isDemoPackage(pkg.id) && (
             <p className="text-xs text-[var(--muted-foreground)] mt-2">Example package. It shows what a published package looks like.</p>
           )}

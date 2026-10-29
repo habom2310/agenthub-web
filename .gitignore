@@ -45,3 +45,6 @@ next-env.d.ts
 /.impeccable/config.local.json
 /.impeccable/hook.cache.json
 /.impeccable/critique/
+
+# Cloudflare local secrets
+.dev.vars*

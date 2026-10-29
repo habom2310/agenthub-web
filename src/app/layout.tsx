@@ -2,17 +2,19 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Logo } from "@/components/Logo";
+import { getSessionUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "AgentHub | One set of agent rules for every coding assistant",
   description: "Keep your agent rules, skills and MCP servers in one place and write them into Claude Code, Cursor, Codex, Antigravity and Windsurf. Browse shared setups and inspect what they add before you install.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const user = await getSessionUser();
   return (
     <html lang="en" className="dark">
       <body className="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen flex flex-col font-sans selection:bg-signal/30 selection:text-[var(--foreground)]">
@@ -22,7 +24,7 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar />
+        <Navbar user={user} />
         <main id="main" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
           {children}
         </main>

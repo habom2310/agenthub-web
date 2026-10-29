@@ -1,4 +1,5 @@
-import { Terminal, Shield, Layers, Cpu, CheckCircle2 } from "lucide-react";
+import Link from "next/link";
+import { Terminal, Shield, Layers, Cpu, CheckCircle2, Github } from "lucide-react";
 import { InstallPill } from "@/components/InstallPill";
 import type { Metadata } from "next";
 
@@ -124,6 +125,45 @@ export default function DocsPage() {
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
             <div className="text-xs font-bold text-signal-soft"># Push and publish your setup to the registry</div>
             <InstallPill command="agenthub share --publish" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Publishes as your GitHub account. The repo must be a public GitHub repo you can push to. Run <code>agenthub login</code> first.
+            </p>
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Remove a package you published</div>
+            <InstallPill command="agenthub unpublish owner/repo" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Allowed for the account that published it. From the CLI, anyone with push access to the repo can also unpublish it.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMAND 5: login, whoami, logout */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <Github className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub login</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Sign in with GitHub before you publish. The CLI shows a one-time code to enter on github.com and asks for no permissions beyond your public profile. You can also sign in on the website from the <Link href="/account" className="text-signal-soft hover:text-signal">account page</Link>.
+        </p>
+
+        <div className="space-y-3 font-mono">
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Sign in with GitHub</div>
+            <InstallPill command="agenthub login" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Show which GitHub account you are signed in as</div>
+            <InstallPill command="agenthub whoami" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Forget the saved login</div>
+            <InstallPill command="agenthub logout" />
           </div>
         </div>
       </section>

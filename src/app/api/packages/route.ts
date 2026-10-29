@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db, initDb } from "@/lib/db";
-import { packages, Package } from "@/lib/db/schema";
+import { initDb } from "@/lib/db";
+import { PublicPackage } from "@/lib/db/schema";
+import { listPackages } from "@/lib/packages";
 import { matchesSearch } from "@/lib/catalog";
 
 export async function GET(request: NextRequest) {
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
     const tag = (searchParams.get("tag") || "").toLowerCase().trim();
     const sort = (searchParams.get("sort") || "recent").toLowerCase().trim();
 
-    let allPackages: Package[] = await db.select().from(packages);
+    let allPackages: PublicPackage[] = await listPackages();
 
     // Same word-prefix search as the site, so the CLI and the web return the same matches
     if (q) {

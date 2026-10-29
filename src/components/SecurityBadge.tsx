@@ -1,11 +1,11 @@
 "use client";
 
 import { ShieldCheck, ShieldAlert, Server, Cpu, Terminal } from "lucide-react";
-import { Package } from "@/lib/db/schema";
+import { PublicPackage } from "@/lib/db/schema";
 import { InstallPill } from "@/components/InstallPill";
 
 interface SecurityBadgeProps {
-  pkg: Package;
+  pkg: PublicPackage;
 }
 
 type Tone = "ok" | "warn" | "danger";
@@ -16,7 +16,7 @@ const toneClasses: Record<Tone, { text: string; pill: string }> = {
   danger: { text: "text-red-400", pill: "bg-red-500/10 text-red-400 border-red-500/20" },
 };
 
-export function getScanStatus(pkg: Pick<Package, "securityRisk" | "isClean">) {
+export function getScanStatus(pkg: Pick<PublicPackage, "securityRisk" | "isClean">) {
   let label: string;
   let tone: Tone;
   if (pkg.securityRisk === "high") {

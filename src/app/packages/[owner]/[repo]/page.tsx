@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
-import { db, initDb } from "@/lib/db";
-import { packages } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { initDb } from "@/lib/db";
+import { getPackage } from "@/lib/packages";
 import { PackageDetailView } from "@/components/PackageDetailView";
 import type { Metadata } from "next";
 
@@ -16,11 +15,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { owner, repo } = await params;
   const packageId = `${owner}/${repo}`;
 
-  const [pkg] = await db
-    .select()
-    .from(packages)
-    .where(eq(packages.id, packageId))
-    .limit(1);
+  const pkg = await getPackage(packageId);
 
   if (!pkg) {
     return {
@@ -39,11 +34,7 @@ export default async function PackageDetailPage({ params }: PageProps) {
   const { owner, repo } = await params;
   const packageId = `${owner}/${repo}`;
 
-  const [pkg] = await db
-    .select()
-    .from(packages)
-    .where(eq(packages.id, packageId))
-    .limit(1);
+  const pkg = await getPackage(packageId);
 
   if (!pkg) {
     notFound();

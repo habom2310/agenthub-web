@@ -1,4 +1,4 @@
-import type { Package } from "@/lib/db/schema";
+import type { PublicPackage } from "@/lib/db/schema";
 
 export const ASSISTANT_LABELS: Record<string, string> = {
   claude: "Claude Code",
@@ -46,12 +46,12 @@ export function filtersToUrl(filters: FilterState): string {
 const words = (text: string) => text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
 
 // Every query term must prefix a word, so "rust" matches "rust-lang" but not "trust"
-export function matchesSearch(pkg: Package, query: string): boolean {
+export function matchesSearch(pkg: PublicPackage, query: string): boolean {
   const pkgWords = words([pkg.id, pkg.name, pkg.description, ...pkg.tags].join(" "));
   return words(query).every((term) => pkgWords.some((w) => w.startsWith(term)));
 }
 
-export function filterPackages(packages: Package[], filters: FilterState): Package[] {
+export function filterPackages(packages: PublicPackage[], filters: FilterState): PublicPackage[] {
   const platform = filters.platform.toLowerCase();
   const type = filters.type.toLowerCase();
 

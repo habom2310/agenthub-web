@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { filterPackages, filtersFromParams, filtersToUrl } from "@/lib/catalog";
 import { registryNote } from "@/lib/demo";
-import type { Package } from "@/lib/db/schema";
+import type { PublicPackage } from "@/lib/db/schema";
 
-const pkg = (overrides: Partial<Package>): Package => ({
+const pkg = (overrides: Partial<PublicPackage>): PublicPackage => ({
   id: "o/r",
   owner: "o",
   repo: "r",
@@ -25,6 +25,7 @@ const pkg = (overrides: Partial<Package>): Package => ({
   readme: "",
   createdAt: "2026-01-01T00:00:00Z",
   updatedAt: "2026-01-01T00:00:00Z",
+  publisher: null,
   ...overrides,
 });
 
