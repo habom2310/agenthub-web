@@ -48,7 +48,7 @@ The registry shows what a package will put into the agent's context (token footp
   The six seeded packages in `src/lib/db/index.ts` (for example `alice/nextjs-agent`) are demo data.
 - No real users, testimonials, install counts or star counts.
   Do not invent them or present seed numbers as real.
-- No logo asset; the current mark is a text "AH" tile.
+- Logo: a "projection fan" mark (one hub fanning out to three assistants) in `src/components/Logo.tsx`, also used as the favicon (`src/app/icon.svg`).
 
 ## Product Principles
 

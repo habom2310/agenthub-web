@@ -40,3 +40,8 @@ next-env.d.ts
 # database
 *.db
 *.db-journal
+
+# impeccable local state
+/.impeccable/config.local.json
+/.impeccable/hook.cache.json
+/.impeccable/critique/

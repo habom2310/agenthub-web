@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-29T02:00:00Z",
+  "title": "Design System: AgentHub",
+  "extensions": {
+    "colorMeta": {
+      "bench-black": {
+        "role": "neutral",
+        "displayName": "Bench Black",
+        "canonical": "#0e0e0d",
+        "tonalRamp": [
+          "#050505",
+          "#0e0e0d",
+          "#171716",
+          "#2a2a28",
+          "#3a3a37",
+          "#55554f",
+          "#9b9a93",
+          "#ecebe6"
+        ]
+      },
+      "panel-graphite": {
+        "role": "neutral",
+        "displayName": "Panel Graphite",
+        "canonical": "#171716",
+        "tonalRamp": [
+          "#050505",
+          "#0e0e0d",
+          "#171716",
+          "#2a2a28",
+          "#3a3a37",
+          "#55554f",
+          "#9b9a93",
+          "#ecebe6"
+        ]
+      },
+      "graphite-rule": {
+        "role": "neutral",
+        "displayName": "Graphite Rule",
+        "canonical": "#2a2a28",
+        "tonalRamp": [
+          "#050505",
+          "#0e0e0d",
+          "#171716",
+          "#2a2a28",
+          "#3a3a37",
+          "#55554f",
+          "#9b9a93",
+          "#ecebe6"
+        ]
+      },
+      "ember-wash": {
+        "role": "primary",
+        "displayName": "Ember Wash",
+        "canonical": "#2b2119",
+        "tonalRamp": [
+          "#3d1505",
+          "#6b2408",
+          "#a3360c",
+          "#d94c10",
+          "#ff6a1a",
+          "#ff8a4a",
+          "#ffa06b",
+          "#ffd2b8"
+        ]
+      },
+      "signal-orange": {
+        "role": "primary",
+        "displayName": "Signal Orange",
+        "canonical": "#ff6a1a",
+        "tonalRamp": [
+          "#3d1505",
+          "#6b2408",
+          "#a3360c",
+          "#d94c10",
+          "#ff6a1a",
+          "#ff8a4a",
+          "#ffa06b",
+          "#ffd2b8"
+        ]
+      },
+      "signal-soft": {
+        "role": "primary",
+        "displayName": "Signal Soft",
+        "canonical": "#ffa06b",
+        "tonalRamp": [
+          "#3d1505",
+          "#6b2408",
+          "#a3360c",
+          "#d94c10",
+          "#ff6a1a",
+          "#ff8a4a",
+          "#ffa06b",
+          "#ffd2b8"
+        ]
+      },
+      "warm-white": {
+        "role": "neutral",
+        "displayName": "Warm White",
+        "canonical": "#ecebe6",
+        "tonalRamp": [
+          "#050505",
+          "#0e0e0d",
+          "#171716",
+          "#2a2a28",
+          "#3a3a37",
+          "#55554f",
+          "#9b9a93",
+          "#ecebe6"
+        ]
+      },
+      "ash-text": {
+        "role": "neutral",
+        "displayName": "Ash Text",
+        "canonical": "#9b9a93",
+        "tonalRamp": [
+          "#050505",
+          "#0e0e0d",
+          "#171716",
+          "#2a2a28",
+          "#3a3a37",
+          "#55554f",
+          "#9b9a93",
+          "#ecebe6"
+        ]
+      },
+      "pass-green": {
+        "role": "status",
+        "displayName": "Pass Green",
+        "canonical": "#34d399",
+        "tonalRamp": [
+          "#064e3b",
+          "#065f46",
+          "#047857",
+          "#059669",
+          "#10b981",
+          "#34d399",
+          "#6ee7b7",
+          "#a7f3d0"
+        ]
+      },
+      "caution-amber": {
+        "role": "status",
+        "displayName": "Caution Amber",
+        "canonical": "#fbbf24",
+        "tonalRamp": [
+          "#78350f",
+          "#92400e",
+          "#b45309",
+          "#d97706",
+          "#f59e0b",
+          "#fbbf24",
+          "#fcd34d",
+          "#fde68a"
+        ]
+      },
+      "alarm-red": {
+        "role": "status",
+        "displayName": "Alarm Red",
+        "canonical": "#f87171",
+        "tonalRamp": [
+          "#7f1d1d",
+          "#991b1b",
+          "#b91c1c",
+          "#dc2626",
+          "#ef4444",
+          "#f87171",
+          "#fca5a5",
+          "#fecaca"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home hero headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles: docs heading, package name."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles and section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Descriptions and paragraphs."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chips, tile captions, metadata."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Anything copyable or runnable: commands, package ids, token counts."
+      }
+    },
+    "shadows": [
+      {
+        "name": "subtle",
+        "value": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "purpose": "Incidental on MCP server cards; not structural."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-change",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Color and border transitions on hover (Tailwind transition-colors / transition-all default)."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Install Pill",
+      "kind": "custom",
+      "refersTo": "install-pill",
+      "description": "Click-to-copy command line used on cards, package header and docs.",
+      "html": "<div class=\"ds-install-pill\" tabindex=\"0\"><span class=\"ds-install-cmd\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-install-icon\"><polyline points=\"4 17 10 11 4 5\"/><line x1=\"12\" x2=\"20\" y1=\"19\" y2=\"19\"/></svg><b>$</b> agenthub add security/agent-harden</span><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"ds-install-copy\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/></svg></div>",
+      "css": ".ds-install-pill { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--background, #0e0e0d); border: 1px solid var(--border, #2a2a28); border-radius: 8px; padding: 6px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--foreground, #ecebe6); cursor: pointer; transition: border-color 150ms; } .ds-install-pill:hover, .ds-install-pill:focus-visible { border-color: rgb(255 106 26 / 0.5); outline: none; } .ds-install-cmd { display: flex; align-items: center; gap: 8px; } .ds-install-cmd b { color: #ff6a1a; } .ds-install-icon { color: #ff6a1a; } .ds-install-copy { color: var(--muted-foreground, #9b9a93); transition: color 150ms; } .ds-install-pill:hover .ds-install-copy { color: #ff6a1a; }"
+    },
+    {
+      "name": "Package Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Catalog tile for one package.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-title\">security/agent-harden</h3><p class=\"ds-card-sub\">Zero-Trust Security &amp; Hardening Rules \u00b7 v2.0.1</p><p class=\"ds-card-body\">Rigorous coding heuristics preventing secret leaks and unsafe shell executions.</p></article>",
+      "css": ".ds-card { background: var(--card, #171716); border: 1px solid var(--border, #2a2a28); border-radius: 12px; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; transition: border-color 150ms; max-width: 360px; } .ds-card:hover { border-color: rgb(255 106 26 / 0.5); } .ds-card-title { margin: 0; font-size: 14px; font-weight: 700; color: var(--foreground, #ecebe6); } .ds-card-sub { margin: 2px 0 8px; font-size: 11px; color: var(--muted-foreground, #9b9a93); } .ds-card-body { margin: 0; font-size: 12px; line-height: 1.625; color: var(--muted-foreground, #9b9a93); }"
+    },
+    {
+      "name": "Readout Tile",
+      "kind": "custom",
+      "refersTo": "readout-tile",
+      "description": "One measured value inside a panel.",
+      "html": "<div class=\"ds-readout\"><span class=\"ds-readout-cap\">Boot Context Footprint</span><strong class=\"ds-readout-val\">850 / 2,000 tk</strong><p class=\"ds-readout-note\">Within the 2,000-token boot context budget.</p></div>",
+      "css": ".ds-readout { background: var(--background, #0e0e0d); border: 1px solid var(--border, #2a2a28); border-radius: 8px; padding: 16px; display: grid; gap: 6px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 260px; } .ds-readout-cap { font-size: 11px; color: var(--muted-foreground, #9b9a93); } .ds-readout-val { font-size: 14px; font-weight: 700; color: #34d399; } .ds-readout-note { margin: 0; font-size: 10px; line-height: 1.625; color: var(--muted-foreground, #9b9a93); }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "chip-meta",
+      "description": "Measured status: Clean, Warnings, Medium risk, High risk.",
+      "html": "<span class=\"ds-status ds-status-ok\">Clean</span> <span class=\"ds-status ds-status-warn\">Medium risk</span> <span class=\"ds-status ds-status-danger\">High risk</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 10px; font-weight: 500; border: 1px solid; white-space: nowrap; } .ds-status-ok { color: #34d399; background: rgb(16 185 129 / 0.1); border-color: rgb(16 185 129 / 0.2); } .ds-status-warn { color: #fbbf24; background: rgb(245 158 11 / 0.1); border-color: rgb(245 158 11 / 0.2); } .ds-status-danger { color: #f87171; background: rgb(239 68 68 / 0.1); border-color: rgb(239 68 68 / 0.2); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The only button style: GitHub, Star, Installs.",
+      "html": "<button class=\"ds-btn-secondary\">GitHub</button>",
+      "css": ".ds-btn-secondary { background: var(--background, #0e0e0d); color: var(--foreground, #ecebe6); border: 1px solid var(--border, #2a2a28); border-radius: 8px; padding: 6px 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 150ms; } .ds-btn-secondary:hover { background: var(--accent, #2b2119); } .ds-btn-secondary:focus-visible { outline: 1px solid var(--ring, #ff6a1a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Navbar search with / key cap.",
+      "html": "<label class=\"ds-search\"><input placeholder=\"Search setups, rules, skills, MCPs...\" /><kbd>/</kbd></label>",
+      "css": ".ds-search { position: relative; display: block; width: 320px; } .ds-search input { width: 100%; box-sizing: border-box; background: var(--background, #0e0e0d); border: 1px solid var(--border, #2a2a28); border-radius: 8px; padding: 6px 32px 6px 12px; font-size: 12px; color: var(--foreground, #ecebe6); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; } .ds-search input::placeholder { color: var(--muted-foreground, #9b9a93); } .ds-search input:focus { outline: none; box-shadow: 0 0 0 1px var(--primary, #ff6a1a); } .ds-search kbd { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; font-family: ui-monospace, monospace; background: var(--card, #171716); border: 1px solid var(--border, #2a2a28); border-radius: 4px; padding: 1px 6px; color: var(--muted-foreground, #9b9a93); }"
+    },
+    {
+      "name": "Detail Tabs",
+      "kind": "nav",
+      "refersTo": "tab-active",
+      "description": "Package detail tab row.",
+      "html": "<nav class=\"ds-tabs\"><a class=\"ds-tab ds-tab-active\">Overview</a><a class=\"ds-tab\">Rules AST</a><a class=\"ds-tab\">Security Scan</a></nav>",
+      "css": ".ds-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--border, #2a2a28); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 12px; } .ds-tab { padding: 10px 0; border-bottom: 2px solid transparent; color: var(--muted-foreground, #9b9a93); cursor: pointer; transition: color 150ms; } .ds-tab:hover { color: var(--foreground, #ecebe6); } .ds-tab-active { color: var(--primary, #ff6a1a); border-color: var(--primary, #ff6a1a); font-weight: 600; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Inspector's Bench",
+    "overview": "AgentHub is a bench where a developer lays a package out and examines it before letting it into their agent. The interface is a dark, dense instrument panel: graphite surfaces, thin graphite rules, small sans text and monospace readouts. Every screen should feel like taking a measurement, with token budgets, risk levels, MCP commands and rule sections shown as readouts rather than marketing. The system is mid-density and dark-only (`<html class=\"dark\">`, no light theme exists). Depth comes from stacked tonal surfaces and borders, not shadows. One accent, Signal Orange, marks the interactive and the active; green, amber and red are reserved for measured status. The owner rejected the earlier indigo-on-slate palette, the indigo-to-purple gradients and 10-11px text; none of them may return.",
+    "keyCharacteristics": [
+      "Dark tonal layering: Bench Black page, Panel Graphite cards, Bench Black readout tiles inside cards.",
+      "One-pixel Graphite Rule borders on every container.",
+      "Monospace for anything a user can copy or run.",
+      "Status color only where a value was measured.",
+      "Compact type with a 12px floor and bold titles."
+    ],
+    "rules": [
+      {
+        "name": "The Measured Color Rule",
+        "body": "Green, amber and red mean a value was measured. Never use them for decoration or for a claim nothing checked.",
+        "section": "colors"
+      },
+      {
+        "name": "The Single Signal Rule",
+        "body": "Signal Orange is the only accent. Do not add a second brand hue, and never reintroduce Tailwind indigo, violet or blue-tinted slate: that pairing is the stock AI-product look this palette replaced.",
+        "section": "colors"
+      },
+      {
+        "name": "The Runnable Is Mono Rule",
+        "body": "Anything the user can copy, paste or run is set in monospace with a `$` prompt.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tone-Not-Shadow Rule",
+        "body": "Separate surfaces with the Panel Graphite / Bench Black step and a Graphite Rule border, not with drop shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every runnable command in an Install Pill, set in monospace with the `$` prompt.",
+      "Do separate surfaces with the Panel Graphite / Bench Black tonal step and a 1px Graphite Rule border.",
+      "Do reserve Pass Green, Caution Amber and Alarm Red for values that were actually measured.",
+      "Do use Signal Orange as the single accent for active, focus and hover states, with Bench Black text on any orange fill."
+    ],
+    "donts": [
+      "Don't use gradients, or indigo, violet or blue-tinted slate anywhere.",
+      "Don't set text below 12px.",
+      "Don't show a \"verified\", \"passed\" or \"clean\" state that is not derived from real package data.",
+      "Don't use drop shadows to create hierarchy."
+    ]
+  }
+}
