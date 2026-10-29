@@ -47,7 +47,36 @@ export const packages = sqliteTable("packages", {
   readme: text("readme").notNull().default(""),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
+  publisherId: integer("publisher_id"), // GitHub user id; null = demo or legacy
+  githubRepoId: integer("github_repo_id"),
+});
+
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey(), // GitHub user id
+  login: text("login").notNull(),
+  name: text("name"),
+  avatarUrl: text("avatar_url"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const sessions = sqliteTable("sessions", {
+  idHash: text("id_hash").primaryKey(), // sha256 of the cookie token
+  userId: integer("user_id").notNull(),
+  createdAt: text("created_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
 });
 
 export type Package = typeof packages.$inferSelect;
 export type NewPackage = typeof packages.$inferInsert;
+export type User = typeof users.$inferSelect;
+
+export interface Publisher {
+  login: string;
+  avatarUrl: string | null;
+}
+
+// A package as the API and the site expose it: publisher details, no internal ids
+export type PublicPackage = Omit<Package, "publisherId" | "githubRepoId"> & {
+  publisher: Publisher | null;
+};

@@ -1,78 +1,74 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHash, timingSafeEqual } from "node:crypto";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { db, initDb } from "@/lib/db";
-import { packages, NewPackage, AstRuleSection } from "@/lib/db/schema";
+import { db } from "@/lib/db";
+import { packages, NewPackage } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { authenticate, unauthorized } from "@/lib/auth";
+import { fetchGithubRepo } from "@/lib/github";
+import { errorResponse } from "@/lib/http";
+import { parseManifest, readJsonBody } from "@/lib/manifest";
+import { getPackage } from "@/lib/packages";
 
-function timingSafeCompare(a: string, b: string): boolean {
-  const hashA = createHash("sha256").update(a).digest();
-  const hashB = createHash("sha256").update(b).digest();
-  return timingSafeEqual(hashA, hashB);
-}
+const GITHUB_NAME = /^[A-Za-z0-9._-]+$/;
+
+const badRequest = (error: string, status = 400) => NextResponse.json({ error }, { status });
 
 export async function POST(request: NextRequest) {
   try {
-    let serverSecret: string | undefined = process.env.REGISTRY_SECRET || process.env.AGENTHUB_PUBLISH_SECRET;
-    try {
-      const { env } = getCloudflareContext();
-      if (env) {
-        const cfSecret = (env as any).REGISTRY_SECRET || (env as any).AGENTHUB_PUBLISH_SECRET;
-        if (typeof cfSecret === "string" && cfSecret.trim()) {
-          serverSecret = cfSecret;
-        }
-      }
-    } catch {}
-
-    if (serverSecret && serverSecret.trim()) {
-      const authHeader = request.headers.get("authorization") || "";
-      const match = authHeader.match(/^Bearer\s+(\S+)$/i);
-      const token = match ? match[1].trim() : "";
-      if (!token || !timingSafeCompare(token, serverSecret.trim())) {
-        return NextResponse.json(
-          { error: "Unauthorized: Invalid or missing publish token." },
-          { status: 401, headers: { "WWW-Authenticate": "Bearer" } }
-        );
-      }
+    const auth = await authenticate(request, { allowSession: false });
+    if (auth?.via !== "bearer") {
+      return unauthorized("Unauthorized: sign in with `agenthub login` to publish.");
     }
+    const { user, token } = auth;
 
-    await initDb();
-    const body = await request.json();
+    const read = await readJsonBody(request);
+    if ("error" in read) return badRequest(read.error, read.status);
+    const parsed = parseManifest(read.body);
+    if ("error" in parsed) return badRequest(parsed.error);
+    const m = parsed.manifest;
 
-    const {
-      owner,
-      repo,
-      name,
-      version = "1.0.0",
-      description = "",
-      type = "profile",
-      platforms = ["gemini", "claude", "cursor"],
-      tags = [],
-      license = "MIT",
-      rulesAst = [],
-      skills = [],
-      mcpServers = [],
-      readme = "",
-      tokenFootprint: explicitTokens,
-      securityRisk = "low",
-      isClean = true,
-    } = body;
+    if (!GITHUB_NAME.test(m.owner) || !GITHUB_NAME.test(m.repo)) {
+      return badRequest("owner and repo must be a valid GitHub owner and repo name.");
+    }
+    const { owner, repo, name, description } = m;
 
-    if (!owner || !repo || !name) {
+    const githubRepo = await fetchGithubRepo(token, owner, repo);
+    if (!githubRepo) {
       return NextResponse.json(
-        { error: "Missing required fields: owner, repo, and name are required." },
+        { error: `GitHub repo ${owner}/${repo} not found or not public.` },
+        { status: 404 }
+      );
+    }
+    if (githubRepo.isPrivate) {
+      return NextResponse.json(
+        { error: `GitHub repo ${owner}/${repo} must be public so others can install it.` },
         { status: 400 }
       );
     }
+    if (!githubRepo.canPush) {
+      return NextResponse.json(
+        { error: `You (@${user.login}) don't have push access to ${owner}/${repo}.` },
+        { status: 403 }
+      );
+    }
 
-    const packageId = `${owner}/${repo}`.toLowerCase();
+    const packageId = githubRepo.fullName;
+    const [canonicalOwner, canonicalRepo] = packageId.split("/");
 
-    // Calculate token footprint if not explicitly specified
-    const computedTokens = (Array.isArray(rulesAst) ? rulesAst : []).reduce(
-      (acc: number, rule: AstRuleSection) => acc + (rule.tokens || 100),
-      0
-    );
+    const [existing] = await db.select().from(packages).where(eq(packages.id, packageId)).limit(1);
+    // A name now pointing at a different GitHub repo (renamed, deleted and re-created) is not ours to overwrite
+    if (
+      existing?.githubRepoId != null &&
+      existing.githubRepoId !== githubRepo.id &&
+      existing.publisherId !== user.id
+    ) {
+      return badRequest(
+        `${packageId} was published from a different GitHub repo. Its publisher must unpublish it first.`,
+        409
+      );
+    }
 
+    const computedTokens = m.rulesAst.reduce((acc, rule) => acc + rule.tokens, 0);
+    const explicitTokens = m.tokenFootprint;
     let tokenFootprint: number;
     if (typeof explicitTokens === "number" && !isNaN(explicitTokens) && explicitTokens > 0) {
       tokenFootprint = Math.max(explicitTokens, computedTokens);
@@ -83,72 +79,48 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date().toISOString();
-
-    const risk = typeof securityRisk === "string" ? securityRisk.toLowerCase() : "";
-    const normalizedSecurityRisk: "low" | "medium" | "high" =
-      risk === "high" || risk === "medium" ? (risk as "high" | "medium") : "low";
+    const risk = typeof m.securityRisk === "string" ? m.securityRisk.toLowerCase() : "";
+    const securityRisk: "low" | "medium" | "high" =
+      risk === "high" || risk === "medium" ? risk : "low";
 
     const newPkg: NewPackage = {
       id: packageId,
-      owner,
-      repo,
+      owner: canonicalOwner,
+      repo: canonicalRepo,
       name,
-      version,
+      version: m.version,
       description,
-      type: type === "addon" ? "addon" : "profile",
-      platforms: Array.isArray(platforms) ? platforms : [],
-      tags: Array.isArray(tags) ? tags : [],
-      license,
-      stars: 1,
-      installCount: 1,
+      type: m.type,
+      platforms: m.platforms,
+      tags: m.tags,
+      license: m.license,
+      stars: 0,
+      installCount: 0,
       tokenFootprint,
-      securityRisk: normalizedSecurityRisk,
-      isClean: isClean === false || isClean === "false" ? false : Boolean(isClean),
-      rulesAst: Array.isArray(rulesAst) ? rulesAst : [],
-      skills: Array.isArray(skills) ? skills : [],
-      mcpServers: Array.isArray(mcpServers) ? mcpServers : [],
-      readme: readme || `# ${name}\n\n${description}`,
+      securityRisk,
+      isClean: m.isClean === false || m.isClean === "false" ? false : Boolean(m.isClean),
+      rulesAst: m.rulesAst,
+      skills: m.skills,
+      mcpServers: m.mcpServers,
+      readme: m.readme || `# ${name}\n\n${description}`,
       createdAt: now,
       updatedAt: now,
+      // Collaborators re-publishing keep the original publisher; unclaimed (demo or legacy) rows are adopted
+      publisherId: existing?.publisherId ?? user.id,
+      githubRepoId: githubRepo.id,
     };
 
-    // Check if exists
-    const [existing] = await db
-      .select()
-      .from(packages)
-      .where(eq(packages.id, packageId))
-      .limit(1);
+    // Upsert keeps concurrent first publishes from failing; stars, installs and creation date stay as first written
+    const { id, stars, installCount, createdAt, ...mutable } = newPkg;
+    await db.insert(packages).values(newPkg).onConflictDoUpdate({ target: packages.id, set: mutable });
 
-    if (existing) {
-      await db
-        .update(packages)
-        .set({
-          ...newPkg,
-          stars: existing.stars,
-          installCount: existing.installCount,
-          createdAt: existing.createdAt,
-          updatedAt: now,
-        })
-        .where(eq(packages.id, packageId));
-    } else {
-      await db.insert(packages).values(newPkg);
-    }
-
-    const [saved] = await db
-      .select()
-      .from(packages)
-      .where(eq(packages.id, packageId))
-      .limit(1);
+    const saved = await getPackage(packageId);
 
     return NextResponse.json(
       { message: "Package indexed successfully", package: saved },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Failed to index package:", error);
-    return NextResponse.json(
-      { error: "Failed to parse or index package manifest" },
-      { status: 500 }
-    );
+    return errorResponse(error, "Failed to index package:", "Failed to index package manifest");
   }
 }

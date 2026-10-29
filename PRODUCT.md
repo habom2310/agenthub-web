@@ -27,14 +27,17 @@ The registry shows what a package will put into the agent's context (token footp
 
 - The CLI is the npm package `@habom2310/agenthub` (source in the sibling repo `../agenthub`).
 - Install: `npm install -g @habom2310/agenthub`, or `npx @habom2310/agenthub setup`.
-- Real CLI commands: `setup`, `init`, `detect`, `doctor`, `link`, `connect`, `project`, `diff`, `promote`, `mcp`, `profile`, `add`, `search`, `info`, `share`, `budget`, `export`, `git`, `push`, `pull`, `uninstall`.
-- Packages are published to the registry through `POST /api/index` with a bearer token.
+- Real CLI commands: `setup`, `init`, `detect`, `doctor`, `link`, `connect`, `project`, `diff`, `promote`, `mcp`, `profile`, `add`, `search`, `info`, `share`, `budget`, `export`, `git`, `push`, `pull`, `uninstall`, `login`, `whoami`, `logout`, `unpublish`.
+- Publishing needs a GitHub login: `agenthub login` (GitHub device flow), or "Sign in" on the website (GitHub OAuth).
+  The CLI publishes through `POST /api/index` with the user's GitHub token as a bearer token.
+  A package id is a public GitHub repo, and you can publish only to repos you can push to.
+  GitHub is the only identity; the registry requests no OAuth scopes and stores sessions hashed.
 - Packages are either a `profile` (a full turnkey setup) or an `addon` (a rule pack, skill or MCP connector added on top).
 
 ## Capabilities and Constraints
 
 - Stack: Next.js 15, React 19, Tailwind 3, Drizzle ORM on SQLite / Cloudflare D1, deployed to Cloudflare Workers via OpenNext.
-- Routes today: catalog explorer (`/`), package detail, CLI docs (`/docs`), registry API (`/api/packages`, `/api/index`).
+- Routes today: catalog explorer (`/`), package detail, CLI docs (`/docs`), account (`/account`), registry API (`/api/packages`, `/api/index`, `/api/auth/*`).
 - Every command shown on the site must match the CLI command reference in `../agenthub/README.md`.
   The npm package is `@habom2310/agenthub`, so `npx` examples must use that name.
 - The CLI runs a static scan (`../agenthub/src/core/security.ts`) when a package is published, and sends `securityRisk` and `isClean` to the registry.

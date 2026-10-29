@@ -12,8 +12,7 @@
     {
       "binding": "DB",
       "database_name": "agenthub-db",
-      "database_id": "ed47bfe6-bc1e-4116-9119-8caac168f2ca",
-      "migrations_dir": "drizzle/migrations"
+      "database_id": "ed47bfe6-bc1e-4116-9119-8caac168f2ca"
     }
   ]
 }

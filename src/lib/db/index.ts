@@ -4,7 +4,7 @@ import { drizzle as drizzleD1, type DrizzleD1Database } from "drizzle-orm/d1";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "./schema";
 import { packages, Package, NewPackage } from "./schema";
-import { eq } from "drizzle-orm";
+import { migrate, d1Runner, libsqlRunner } from "./migrations";
 
 let localClient: Client | null = null;
 let localDb: LibSQLDatabase<typeof schema> | null = null;
@@ -383,32 +383,6 @@ export const SEED_PACKAGES: NewPackage[] = [
   }
 ];
 
-const CREATE_TABLE_SQL = `
-  CREATE TABLE IF NOT EXISTS packages (
-    id TEXT PRIMARY KEY,
-    owner TEXT NOT NULL,
-    repo TEXT NOT NULL,
-    name TEXT NOT NULL,
-    version TEXT NOT NULL DEFAULT '1.0.0',
-    description TEXT NOT NULL DEFAULT '',
-    type TEXT NOT NULL DEFAULT 'profile',
-    platforms TEXT NOT NULL DEFAULT '[]',
-    tags TEXT NOT NULL DEFAULT '[]',
-    license TEXT NOT NULL DEFAULT 'MIT',
-    stars INTEGER NOT NULL DEFAULT 0,
-    install_count INTEGER NOT NULL DEFAULT 0,
-    token_footprint INTEGER NOT NULL DEFAULT 0,
-    security_risk TEXT NOT NULL DEFAULT 'low',
-    is_clean INTEGER NOT NULL DEFAULT 1,
-    mcp_servers TEXT NOT NULL DEFAULT '[]',
-    skills TEXT NOT NULL DEFAULT '[]',
-    rules_ast TEXT NOT NULL DEFAULT '[]',
-    readme TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  );
-`;
-
 let initialized = false;
 let initPromise: Promise<void> | null = null;
 
@@ -424,18 +398,15 @@ export async function initDb() {
       // Cloudflare context unavailable
     }
 
-    const cleanSql = CREATE_TABLE_SQL.replace(/\s+/g, " ").trim();
-
     if (ctx) {
       if (!ctx.env?.DB) {
         throw new Error(
           "Cloudflare context detected, but DB binding (ctx.env.DB) is missing. Check wrangler.jsonc d1_databases configuration."
         );
       }
-      await ctx.env.DB.prepare(cleanSql).run();
+      await migrate(d1Runner(ctx.env.DB));
     } else {
-      const client = getLocalClient();
-      await client.execute(cleanSql);
+      await migrate(libsqlRunner(getLocalClient()));
     }
 
     const [existing] = await db.select().from(packages).limit(1);

@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
-import { Package } from "@/lib/db/schema";
+import { PublicPackage } from "@/lib/db/schema";
 import { InstallPill } from "./InstallPill";
 import { getScanStatus } from "./SecurityBadge";
 import { assistantLabel } from "@/lib/catalog";
 import { isDemoPackage } from "@/lib/demo";
 
 interface PackageCardProps {
-  pkg: Package;
+  pkg: PublicPackage;
 }
 
 const plural = (n: number, noun: string) => `${n} ${noun}${n === 1 ? "" : "s"}`;

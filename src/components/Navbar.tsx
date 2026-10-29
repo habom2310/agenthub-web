@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Github, X } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { Search, Github, LogIn, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "./Logo";
+import type { AuthUser } from "@/lib/auth";
 
 // Below md the search field collapses behind an icon so the header stays one row
 function NavSearch() {
@@ -49,7 +50,7 @@ function NavSearch() {
         onClick={() => setSearchOpen((open) => !open)}
         aria-label={searchOpen ? "Close search" : "Search packages"}
         aria-expanded={searchOpen}
-        className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]"
+        className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]"
       >
         {searchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
       </button>
@@ -85,15 +86,49 @@ function NavSearch() {
   );
 }
 
-export function Navbar() {
+const accountButton =
+  "flex items-center justify-center gap-1.5 min-w-9 h-9 md:h-auto bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] text-[var(--foreground)] px-2 md:py-1.5 rounded-lg text-xs font-semibold transition-colors";
+
+function AccountLink({ user }: { user: AuthUser | null }) {
+  const pathname = usePathname();
+
+  if (user) {
+    return (
+      <Link href="/account" aria-label={`Your account, @${user.login}`} className={cn(accountButton, "md:order-last")}>
+        {user.avatarUrl ? (
+          <img src={user.avatarUrl} alt="" width={24} height={24} className="w-6 h-6 rounded-full flex-shrink-0" />
+        ) : (
+          <span className="w-6 h-6 rounded-full bg-[var(--accent)] text-signal flex items-center justify-center flex-shrink-0">
+            {user.login.charAt(0).toUpperCase()}
+          </span>
+        )}
+        <span className="hidden sm:inline font-mono max-w-[10rem] truncate">@{user.login}</span>
+      </Link>
+    );
+  }
+
   return (
-    <header className="border-b border-[var(--border)] bg-[var(--card)] sticky top-0 z-50 px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
-      <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+    // A plain anchor: the login route redirects off-site, so client routing must not intercept it
+    <a
+      href={`/api/auth/github/login?returnTo=${encodeURIComponent(pathname || "/account")}`}
+      aria-label="Sign in with GitHub"
+      className={cn(accountButton, "md:order-last")}
+    >
+      <LogIn className="w-4 h-4 md:w-3.5 md:h-3.5" />
+      <span className="hidden sm:inline">Sign in</span>
+    </a>
+  );
+}
+
+export function Navbar({ user }: { user: AuthUser | null }) {
+  return (
+    <header className="border-b border-[var(--border)] bg-[var(--card)] sticky top-0 z-50 px-3 sm:px-6 py-3 flex items-center justify-between gap-2 sm:gap-3">
+      <div className="flex items-center gap-3 sm:gap-6 min-w-0">
         <Link href="/" className="flex-shrink-0">
           <Logo />
         </Link>
 
-        <nav className="flex items-center gap-4 sm:gap-5 text-sm font-medium text-[var(--muted-foreground)]">
+        <nav className="flex items-center gap-3 sm:gap-5 text-sm font-medium text-[var(--muted-foreground)]">
           <Link href="/#registry" className="hover:text-[var(--primary)] transition-colors">
             Registry
           </Link>
@@ -117,6 +152,8 @@ export function Navbar() {
           <Github className="w-4 h-4 md:w-3.5 md:h-3.5" />
           <span className="hidden md:inline">GitHub</span>
         </a>
+
+        <AccountLink user={user} />
       </div>
     </header>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Package } from "@/lib/db/schema";
+import { PublicPackage } from "@/lib/db/schema";
 import { PackageCard } from "./PackageCard";
 import { SearchFilters } from "./SearchFilters";
 import { FilterState, filterPackages, filtersFromParams, filtersToUrl } from "@/lib/catalog";
@@ -9,7 +9,7 @@ import { PackageSearch } from "lucide-react";
 import { registryNote } from "@/lib/demo";
 
 interface CatalogExplorerProps {
-  initialPackages: Package[];
+  initialPackages: PublicPackage[];
 }
 
 export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
