@@ -6,6 +6,7 @@ import { PackageCard } from "./PackageCard";
 import { SearchFilters } from "./SearchFilters";
 import { FilterState, filterPackages, filtersFromParams, filtersToUrl } from "@/lib/catalog";
 import { PackageSearch } from "lucide-react";
+import { registryNote } from "@/lib/demo";
 
 interface CatalogExplorerProps {
   initialPackages: Package[];
@@ -21,14 +22,13 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
   const setFilters = (next: FilterState, replace = false) =>
     window.history[replace ? "replaceState" : "pushState"](null, "", filtersToUrl(next));
   const clearAllFilters = () => window.history.pushState(null, "", "/");
+  const demoNote = registryNote(initialPackages.map((p) => p.id));
 
   return (
     <div className="space-y-6">
       <div className="space-y-1 border-t border-[var(--border)] pt-8">
         <h2 id="registry" className="scroll-mt-24 text-xl font-bold tracking-tight text-[var(--foreground)]">Registry</h2>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          Example packages only. Nothing has been published yet, so these show what a package looks like.
-        </p>
+        {demoNote && <p className="text-sm text-[var(--muted-foreground)]">{demoNote}</p>}
       </div>
 
       {/* Filter and Controls */}

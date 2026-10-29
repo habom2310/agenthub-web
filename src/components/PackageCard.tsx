@@ -6,6 +6,7 @@ import { Package } from "@/lib/db/schema";
 import { InstallPill } from "./InstallPill";
 import { getScanStatus } from "./SecurityBadge";
 import { assistantLabel } from "@/lib/catalog";
+import { isDemoPackage } from "@/lib/demo";
 
 interface PackageCardProps {
   pkg: Package;
@@ -49,6 +50,7 @@ export function PackageCard({ pkg }: PackageCardProps) {
             className="px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap flex-shrink-0 bg-[var(--background)] text-[var(--muted-foreground)] border-[var(--border)]"
           >
             {isProfile ? "Profile" : "Add-on"}
+            {isDemoPackage(pkg.id) && " · Example"}
           </span>
         </div>
 

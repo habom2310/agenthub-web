@@ -8,6 +8,7 @@ import { McpVisualizer } from "./McpVisualizer";
 import { SecurityBadge, getScanStatus } from "./SecurityBadge";
 import { InstallPill } from "./InstallPill";
 import { assistantLabel } from "@/lib/catalog";
+import { isDemoPackage } from "@/lib/demo";
 import {
   ExternalLink,
   BookOpen,
@@ -115,7 +116,9 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
           <p className="text-sm text-[var(--muted-foreground)] mt-1.5 max-w-3xl text-pretty">
             {pkg.description}
           </p>
-          <p className="text-xs text-[var(--muted-foreground)] mt-2">Example package. Nothing has been published to the registry yet.</p>
+          {isDemoPackage(pkg.id) && (
+            <p className="text-xs text-[var(--muted-foreground)] mt-2">Example package. It shows what a published package looks like.</p>
+          )}
         </div>
 
         {/* Action Buttons */}

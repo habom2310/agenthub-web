@@ -69,7 +69,7 @@ export const db = new Proxy({} as ReturnType<typeof getDb>, {
   },
 });
 
-const SEED_PACKAGES: NewPackage[] = [
+export const SEED_PACKAGES: NewPackage[] = [
   {
     id: "alice/nextjs-agent",
     owner: "alice",
