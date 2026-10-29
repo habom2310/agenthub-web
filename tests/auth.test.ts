@@ -159,6 +159,17 @@ describe("website login", () => {
     expect(res.headers.get("location")).toBe(`${ORIGIN}/account?error=oauth_denied`);
   });
 
+  it("logs GitHub's error code when the code exchange is rejected", async () => {
+    mockGithub({ tokens: {}, repos: {}, codes: {} });
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { cookie, state } = await start();
+    const res = await finish(`code=wrong&state=${state}`, cookie);
+    expect(res.headers.get("location")).toBe(`${ORIGIN}/account?error=oauth_failed`);
+    expect(String(log.mock.calls[0]?.[1])).toContain("bad_verification_code");
+    expect(res.cookies.get("ah_session")).toBeUndefined();
+    log.mockRestore();
+  });
+
   it("creates a hashed session, sets the cookie and redirects to returnTo", async () => {
     const calls = mockGithub({ tokens: { "gh-token": dana }, repos: {}, codes: { good: "gh-token" } });
     const { cookie, state } = await start("/packages/a/b");

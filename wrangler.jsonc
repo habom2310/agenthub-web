@@ -12,6 +12,9 @@
   "vars": {
     "GITHUB_CLIENT_ID": "Ov23li1sYIWxaWE2NBwq"
   },
+  "observability": {
+    "enabled": true
+  },
   "d1_databases": [
     {
       "binding": "DB",
