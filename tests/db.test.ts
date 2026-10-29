@@ -10,8 +10,8 @@ vi.mock("@opennextjs/cloudflare", async (importOriginal) => {
 });
 
 // Import db after vi.mock
-import { db, initDb, getDb, SEED_PACKAGES } from "@/lib/db";
-import { DEMO_PACKAGE_IDS } from "@/lib/demo";
+import { db, initDb, getDb } from "@/lib/db";
+import { packages } from "@/lib/db/schema";
 
 describe("Database Proxy and Initialization", () => {
   beforeEach(() => {
@@ -36,8 +36,9 @@ describe("Database Proxy and Initialization", () => {
     expect("select" in db).toBe(true);
   });
 
-  it("lists every seeded package as a demo package", () => {
-    expect(SEED_PACKAGES.map((p) => p.id).sort()).toEqual([...DEMO_PACKAGE_IDS].sort());
+  it("starts with an empty registry", async () => {
+    await initDb();
+    expect(await db.select().from(packages)).toEqual([]);
   });
 
   it("throws descriptive error when Cloudflare context exists but DB binding is missing", () => {

@@ -8,7 +8,6 @@ import { McpVisualizer } from "./McpVisualizer";
 import { SecurityBadge, getScanStatus } from "./SecurityBadge";
 import { InstallPill } from "./InstallPill";
 import { assistantLabel } from "@/lib/catalog";
-import { isDemoPackage } from "@/lib/demo";
 import {
   ExternalLink,
   BookOpen,
@@ -131,9 +130,6 @@ export function PackageDetailView({ pkg }: PackageDetailViewProps) {
                 @{pkg.publisher.login}
               </a>
             </p>
-          )}
-          {isDemoPackage(pkg.id) && (
-            <p className="text-xs text-[var(--muted-foreground)] mt-2">Example package. It shows what a published package looks like.</p>
           )}
         </div>
 

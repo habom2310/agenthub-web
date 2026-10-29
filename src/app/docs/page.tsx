@@ -49,7 +49,7 @@ export default function DocsPage() {
         <div className="space-y-3 font-mono">
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
             <div className="text-xs font-bold text-signal-soft"># Switch your hub to a profile from the registry</div>
-            <InstallPill command="agenthub profile use alice/nextjs-agent" />
+            <InstallPill command="agenthub profile use habom2310/my-agenthub-setting" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
               Downloads the package manifest, compiles rules AST, projects instructions to <code>GEMINI.md</code>, <code>CLAUDE.md</code>, and Cursor rules (<code>agenthub.mdc</code>), and binds MCP servers.
             </p>

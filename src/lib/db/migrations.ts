@@ -72,6 +72,12 @@ export const MIGRATIONS: Migration[] = [
     id: "0003_remove_live_test_agent",
     statements: ["DELETE FROM packages WHERE id = 'community/live-test-agent'"],
   },
+  {
+    id: "0004_remove_demo_packages",
+    statements: [
+      "DELETE FROM packages WHERE publisher_id IS NULL AND id IN ('alice/nextjs-agent', 'security/agent-harden', 'python-dev/fastapi-agent', 'cloud/gcp-devops', 'rust-lang/cargo-agent', 'data/duckdb-analytics')",
+    ],
+  },
 ];
 
 async function resolveSteps(runner: SqlRunner, steps: Step[]): Promise<string[]> {

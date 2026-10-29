@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { filterPackages, filtersFromParams, filtersToUrl } from "@/lib/catalog";
-import { registryNote } from "@/lib/demo";
 import type { PublicPackage } from "@/lib/db/schema";
 
 const pkg = (overrides: Partial<PublicPackage>): PublicPackage => ({
@@ -90,20 +89,5 @@ describe("search edge cases", () => {
   it("treats an empty or punctuation-only query as no search", () => {
     expect(filterPackages(all, { ...defaults, search: "  " })).toHaveLength(2);
     expect(filterPackages(all, { ...defaults, search: "!!" })).toHaveLength(2);
-  });
-});
-
-describe("registryNote", () => {
-  it("says nothing is published when only demo packages exist", () => {
-    expect(registryNote(["alice/nextjs-agent"])).toMatch(/Nothing has been published/);
-  });
-
-  it("flags demo data once real packages exist", () => {
-    expect(registryNote(["alice/nextjs-agent", "bob/real"])).toBe("Packages marked Example are demo data.");
-  });
-
-  it("shows no note without demo packages", () => {
-    expect(registryNote(["bob/real"])).toBeNull();
-    expect(registryNote([])).toBeNull();
   });
 });
