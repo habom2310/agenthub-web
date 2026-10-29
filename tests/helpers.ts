@@ -1,5 +1,7 @@
 import { vi } from "vitest";
 import { NextRequest } from "next/server";
+import { db } from "@/lib/db";
+import { packages, type NewPackage } from "@/lib/db/schema";
 
 export interface FakeGithubUser {
   id: number;
@@ -65,3 +67,10 @@ export const jsonRequest = (url: string, method: string, body?: unknown, headers
     headers: { "Content-Type": "application/json", ...headers },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+
+// Inserts a minimal package row; id "owner/repo" drives owner and repo
+export async function insertPackage(id: string, overrides: Partial<NewPackage> = {}) {
+  const [owner, repo] = id.split("/");
+  const now = new Date().toISOString();
+  await db.insert(packages).values({ id, owner, repo, name: repo, createdAt: now, updatedAt: now, ...overrides });
+}

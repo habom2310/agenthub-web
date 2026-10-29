@@ -49,7 +49,7 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: `Package '${packageId}' not found` }, { status: 404 });
     }
     if (pkg.publisherId === null) {
-      return NextResponse.json({ error: "Demo packages can't be unpublished." }, { status: 403 });
+      return NextResponse.json({ error: "This package has no publisher and can't be unpublished." }, { status: 403 });
     }
 
     const { user } = auth;

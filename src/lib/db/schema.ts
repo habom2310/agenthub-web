@@ -47,7 +47,7 @@ export const packages = sqliteTable("packages", {
   readme: text("readme").notNull().default(""),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
-  publisherId: integer("publisher_id"), // GitHub user id; null = demo or legacy
+  publisherId: integer("publisher_id"), // GitHub user id; null = legacy
   githubRepoId: integer("github_repo_id"),
 });
 

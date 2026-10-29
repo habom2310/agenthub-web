@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       readme: m.readme || `# ${name}\n\n${description}`,
       createdAt: now,
       updatedAt: now,
-      // Collaborators re-publishing keep the original publisher; unclaimed (demo or legacy) rows are adopted
+      // Collaborators re-publishing keep the original publisher; unclaimed (legacy) rows are adopted
       publisherId: existing?.publisherId ?? user.id,
       githubRepoId: githubRepo.id,
     };

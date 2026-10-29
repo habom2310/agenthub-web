@@ -1,17 +1,52 @@
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { NextRequest } from "next/server";
 import { GET as getPackages } from "@/app/api/packages/route";
 import { GET as getPackageDetail } from "@/app/api/packages/[owner]/[repo]/route";
-import { initDb } from "@/lib/db";
+import { db, initDb } from "@/lib/db";
+import { packages } from "@/lib/db/schema";
+import { inArray } from "drizzle-orm";
+import { insertPackage } from "./helpers";
 import { PublicPackage as Package } from "@/lib/db/schema";
 
 describe("AgentHub Web API", () => {
+  const fixtureIds = ["alice/nextjs-agent", "rust-lang/cargo-agent", "security/agent-harden"];
+
   beforeAll(async () => {
     await initDb();
+    await insertPackage("alice/nextjs-agent", {
+      name: "Fullstack Next.js Agent",
+      description: "Next.js App Router setup",
+      type: "profile",
+      platforms: ["claude", "cursor"],
+      tags: ["nextjs"],
+      tokenFootprint: 1420,
+      createdAt: "2026-01-01T00:00:00.000Z",
+      mcpServers: [{ name: "postgres", command: "npx -y server-postgres", args: [], env: [], risk: "low", status: "verified" }],
+      rulesAst: [{ title: "rules/common.md > ## 1", file: "rules/common.md", tokens: 195, content: "Think before coding." }],
+    });
+    await insertPackage("rust-lang/cargo-agent", {
+      name: "Rust Toolchain",
+      type: "profile",
+      platforms: ["gemini"],
+      tokenFootprint: 900,
+      createdAt: "2026-02-01T00:00:00.000Z",
+    });
+    await insertPackage("security/agent-harden", {
+      name: "Zero-Trust Security",
+      description: "Blocks untrusted shell executions",
+      type: "addon",
+      platforms: ["claude"],
+      tokenFootprint: 380,
+      createdAt: "2026-03-01T00:00:00.000Z",
+    });
+  });
+
+  afterAll(async () => {
+    await db.delete(packages).where(inArray(packages.id, fixtureIds));
   });
 
   describe("GET /api/packages", () => {
-    it("returns default seeded packages", async () => {
+    it("returns the published packages", async () => {
       const req = new NextRequest("http://localhost:3000/api/packages");
       const res = await getPackages(req);
       expect(res.status).toBe(200);
@@ -20,7 +55,6 @@ describe("AgentHub Web API", () => {
       expect(data).toHaveProperty("total");
       expect(data).toHaveProperty("packages");
       expect(Array.isArray(data.packages)).toBe(true);
-      expect(data.packages.length).toBeGreaterThanOrEqual(1);
 
       const ids = data.packages.map((p: Package) => p.id);
       expect(ids).toContain("alice/nextjs-agent");

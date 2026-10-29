@@ -38,10 +38,6 @@ export function getScanStatus(pkg: Pick<PublicPackage, "securityRisk" | "isClean
 const riskTone: Record<string, Tone> = { low: "ok", medium: "warn", high: "danger" };
 
 export function SecurityBadge({ pkg }: SecurityBadgeProps) {
-  const maxTokens = 2000;
-  const pct = Math.min(Math.round((pkg.tokenFootprint / maxTokens) * 100), 100);
-  const isBudgetOk = pkg.tokenFootprint <= maxTokens;
-  const budgetTone = toneClasses[isBudgetOk ? "ok" : "warn"];
   const status = getScanStatus(pkg);
   const riskyServers = pkg.mcpServers.filter((s) => s.risk !== "low");
   const StatusIcon = status.tone === "ok" ? ShieldCheck : ShieldAlert;
@@ -106,24 +102,17 @@ export function SecurityBadge({ pkg }: SecurityBadgeProps) {
           )}
         </div>
 
-        {/* Boot Context Budget */}
+        {/* Startup context */}
         <div className="p-4 border border-[var(--border)] rounded-lg bg-[var(--background)] space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-[var(--muted-foreground)] flex items-center space-x-1">
-              <Cpu className="w-3.5 h-3.5 text-signal" />
-              <span>Context Added at Startup</span>
-            </span>
-            <span className={`text-xs font-mono px-1.5 py-0.5 rounded border ${budgetTone.pill}`}>
-              {pct}%
-            </span>
-          </div>
-          <div className={`text-sm font-bold ${budgetTone.text}`}>
-            {pkg.tokenFootprint.toLocaleString()} of {maxTokens.toLocaleString()} tokens
+          <span className="text-xs text-[var(--muted-foreground)] flex items-center space-x-1">
+            <Cpu className="w-3.5 h-3.5 text-signal" />
+            <span>Context Added at Startup</span>
+          </span>
+          <div className="text-sm font-bold font-mono text-[var(--foreground)]">
+            {pkg.tokenFootprint.toLocaleString()} tokens
           </div>
           <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-            {isBudgetOk
-              ? "Within the 2,000-token boot context budget. Leaves headroom for large task prompts."
-              : "Exceeds the 2,000-token boot target. Recommended for large-window LLMs only."}
+            Tokens this package adds to the assistant&apos;s context when a session starts.
           </p>
         </div>
       </div>

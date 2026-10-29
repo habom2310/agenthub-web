@@ -47,10 +47,9 @@ The registry shows what a package will put into the agent's context (token footp
 
 ## Evidence on Hand
 
-- No real published packages yet.
-  The six seeded packages in `src/lib/db/index.ts` (for example `alice/nextjs-agent`) are demo data.
+- The registry holds only packages that real publishers have published.
 - No real users, testimonials, install counts or star counts.
-  Do not invent them or present seed numbers as real.
+  Do not invent them or present placeholder numbers as real.
 - Logo: a "projection fan" mark (one hub fanning out to three assistants) in `src/components/Logo.tsx`, also used as the favicon (`src/app/icon.svg`).
 
 ## Product Principles

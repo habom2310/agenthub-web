@@ -7,7 +7,7 @@ import { createSession } from "@/lib/auth";
 import { db, initDb } from "@/lib/db";
 import { packages, users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { jsonRequest, mockGithub } from "./helpers";
+import { insertPackage, jsonRequest, mockGithub } from "./helpers";
 
 const alice = { id: 1, login: "alice-dev", name: "Alice", avatar_url: "https://avatars.test/alice" };
 const carol = { id: 3, login: "Carol", name: null, avatar_url: "https://avatars.test/carol" };
@@ -63,6 +63,7 @@ describe("POST /api/index", () => {
     vi.unstubAllGlobals();
     await db.delete(packages).where(eq(packages.owner, "bob"));
     await db.delete(packages).where(eq(packages.owner, "carol"));
+    await db.delete(packages).where(eq(packages.owner, "legacy"));
   });
 
   it("rejects a missing token with 401 and WWW-Authenticate", async () => {
@@ -355,10 +356,13 @@ describe("DELETE /api/packages/{owner}/{repo}", () => {
     expect(await exists("bob/vue-agent")).toBe(true);
   });
 
-  it("demo packages (no publisher) cannot be deleted", async () => {
-    expect((await unpublish("alice/nextjs-agent", bearer("tok-alice"))).status).toBe(403);
+  it("packages with no publisher cannot be deleted", async () => {
+    await insertPackage("legacy/unclaimed-agent");
+    const res = await unpublish("legacy/unclaimed-agent", bearer("tok-alice"));
+    expect(res.status).toBe(403);
+    expect((await res.json()).error).toBe("This package has no publisher and can't be unpublished.");
     const cookie = await sessionCookie({ id: 1, login: "alice" });
-    expect((await unpublish("alice/nextjs-agent", { ...origin, ...cookie })).status).toBe(403);
-    expect(await exists("alice/nextjs-agent")).toBe(true);
+    expect((await unpublish("legacy/unclaimed-agent", { ...origin, ...cookie })).status).toBe(403);
+    expect(await exists("legacy/unclaimed-agent")).toBe(true);
   });
 });

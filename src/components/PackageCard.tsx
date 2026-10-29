@@ -6,7 +6,6 @@ import { PublicPackage } from "@/lib/db/schema";
 import { InstallPill } from "./InstallPill";
 import { getScanStatus } from "./SecurityBadge";
 import { assistantLabel } from "@/lib/catalog";
-import { isDemoPackage } from "@/lib/demo";
 
 interface PackageCardProps {
   pkg: PublicPackage;
@@ -22,8 +21,6 @@ export function PackageCard({ pkg }: PackageCardProps) {
 
   const scanStatus = getScanStatus(pkg);
   const initial = pkg.owner.charAt(0).toUpperCase();
-  const maxBudget = 2000;
-  const tokenPct = Math.min(Math.round((pkg.tokenFootprint / maxBudget) * 100), 100);
 
   return (
     <div className="relative bg-[var(--card)] border border-[var(--border)] hover:border-signal/50 has-[h3_a:focus-visible]:border-[var(--ring)] rounded-xl p-5 transition-colors flex flex-col justify-between">
@@ -50,7 +47,6 @@ export function PackageCard({ pkg }: PackageCardProps) {
             className="px-2 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap flex-shrink-0 bg-[var(--background)] text-[var(--muted-foreground)] border-[var(--border)]"
           >
             {isProfile ? "Profile" : "Add-on"}
-            {isDemoPackage(pkg.id) && " · Example"}
           </span>
         </div>
 
@@ -80,22 +76,12 @@ export function PackageCard({ pkg }: PackageCardProps) {
           </span>
         </div>
 
-        {/* Token Budget Bar */}
-        <div className="space-y-1 pt-1">
-          <div className="flex flex-wrap justify-between gap-x-3 text-xs">
-            <span className="text-[var(--muted-foreground)] whitespace-nowrap">Context added at startup</span>
-            <span className={`font-mono font-medium whitespace-nowrap ${tokenPct > 80 ? "text-amber-400" : "text-emerald-400"}`}>
-              {pkg.tokenFootprint.toLocaleString()} of {maxBudget.toLocaleString()} tokens
-            </span>
-          </div>
-          <div className="w-full bg-[var(--background)] rounded-full h-1.5 overflow-hidden">
-            <div
-              className={`h-1.5 rounded-full transition-all ${
-                tokenPct > 80 ? "bg-amber-500" : "bg-emerald-500"
-              }`}
-              style={{ width: `${tokenPct}%` }}
-            />
-          </div>
+        {/* Startup context */}
+        <div className="flex flex-wrap justify-between gap-x-3 pt-1 text-xs">
+          <span className="text-[var(--muted-foreground)] whitespace-nowrap">Context added at startup</span>
+          <span className="font-mono font-medium text-[var(--foreground)] whitespace-nowrap">
+            {pkg.tokenFootprint.toLocaleString()} tokens
+          </span>
         </div>
 
         {/* Quick Install Pill */}

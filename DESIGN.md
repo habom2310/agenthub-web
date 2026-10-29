@@ -142,8 +142,8 @@ Neutral graphite with no blue cast, one hot signal orange, and three status colo
 - **Ash Text** (#9b9a93): secondary text, descriptions and placeholders.
 
 ### Status
-- **Pass Green** (#34d399): a clean scan, a token budget within limit, a successful copy.
-- **Caution Amber** (#fbbf24): medium risk, scan warnings, a budget over limit.
+- **Pass Green** (#34d399): a clean scan, a successful copy.
+- **Caution Amber** (#fbbf24): medium risk, scan warnings.
 - **Alarm Red** (#f87171): high risk.
 
 Status colors appear as text on a 10% tint of the same hue with a 20% border.

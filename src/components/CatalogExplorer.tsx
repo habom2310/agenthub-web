@@ -6,7 +6,6 @@ import { PackageCard } from "./PackageCard";
 import { SearchFilters } from "./SearchFilters";
 import { FilterState, filterPackages, filtersFromParams, filtersToUrl } from "@/lib/catalog";
 import { PackageSearch } from "lucide-react";
-import { registryNote } from "@/lib/demo";
 
 interface CatalogExplorerProps {
   initialPackages: PublicPackage[];
@@ -16,19 +15,18 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
   const searchParams = useSearchParams();
   const filters = filtersFromParams(searchParams);
   const filteredPackages = filterPackages(initialPackages, filters);
+  const isRegistryEmpty = initialPackages.length === 0;
 
   // Filters live in the URL so navbar search, Back and shared links all work.
   // pushState updates useSearchParams without a server round trip.
   const setFilters = (next: FilterState, replace = false) =>
     window.history[replace ? "replaceState" : "pushState"](null, "", filtersToUrl(next));
   const clearAllFilters = () => window.history.pushState(null, "", "/");
-  const demoNote = registryNote(initialPackages.map((p) => p.id));
 
   return (
     <div className="space-y-6">
       <div className="space-y-1 border-t border-[var(--border)] pt-8">
         <h2 id="registry" className="scroll-mt-24 text-xl font-bold tracking-tight text-[var(--foreground)]">Registry</h2>
-        {demoNote && <p className="text-sm text-[var(--muted-foreground)]">{demoNote}</p>}
       </div>
 
       {/* Filter and Controls */}
@@ -59,16 +57,22 @@ export function CatalogExplorer({ initialPackages }: CatalogExplorerProps) {
           <div className="w-12 h-12 rounded-full bg-[var(--secondary)] flex items-center justify-center mx-auto text-[var(--muted-foreground)]">
             <PackageSearch className="w-6 h-6" />
           </div>
-          <h3 className="text-sm font-bold text-[var(--foreground)]">No packages match these filters</h3>
+          <h3 className="text-sm font-bold text-[var(--foreground)]">
+            {isRegistryEmpty ? "No packages published yet" : "No packages match these filters"}
+          </h3>
           <p className="text-xs text-[var(--muted-foreground)] max-w-sm mx-auto">
-            Try a shorter search term or a different assistant.
+            {isRegistryEmpty
+              ? "Packages appear here as soon as someone publishes one."
+              : "Try a shorter search term or a different assistant."}
           </p>
-          <button
-            onClick={clearAllFilters}
-            className="bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] text-[var(--foreground)] text-sm px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            Reset filters
-          </button>
+          {!isRegistryEmpty && (
+            <button
+              onClick={clearAllFilters}
+              className="bg-[var(--background)] hover:bg-[var(--accent)] border border-[var(--border)] text-[var(--foreground)] text-sm px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Reset filters
+            </button>
+          )}
         </div>
       )}
     </div>
