@@ -7,6 +7,7 @@ const TARGETS = [
   { assistant: "Codex", path: "~/.codex/AGENTS.md" },
   { assistant: "Cursor", path: "~/.cursor/rules/agenthub.mdc" },
   { assistant: "Windsurf", path: "~/.codeium/windsurf/memories/global_rules.md" },
+  { assistant: "Pi", path: "~/.pi/agent/AGENTS.md" },
 ];
 
 const STEPS = [
@@ -36,7 +37,7 @@ export function ProjectionHero() {
           </h1>
           <p className="text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed max-w-[60ch]">
             AgentHub keeps your rules, skills and MCP servers in one place and writes them into each
-            assistant&rsquo;s own format, so Claude Code, Cursor, Codex, Antigravity and Windsurf stop drifting apart.
+            assistant&rsquo;s own format, so Claude Code, Cursor, Codex, Antigravity, Windsurf, GitHub Copilot CLI and Pi stop drifting apart.
           </p>
         </div>
 
@@ -89,7 +90,7 @@ export function ProjectionHero() {
         </ul>
 
         <figcaption className="text-xs text-[var(--muted-foreground)] leading-relaxed">
-          Skills folders are linked, not copied, and MCP servers are synced into each assistant&rsquo;s config.
+          Skills folders are linked, not copied, and MCP servers are synced into each assistant&rsquo;s config. GitHub Copilot CLI has no rules file here: it gets skills and MCP servers only.
         </figcaption>
       </figure>
     </section>

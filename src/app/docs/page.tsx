@@ -1,5 +1,20 @@
 import Link from "next/link";
-import { Terminal, Shield, Layers, Cpu, CheckCircle2, Github } from "lucide-react";
+import {
+  Terminal,
+  Shield,
+  Layers,
+  Cpu,
+  CheckCircle2,
+  Github,
+  Download,
+  ListChecks,
+  RefreshCw,
+  KeyRound,
+  FolderInput,
+  Stethoscope,
+  GitBranch,
+  Lock,
+} from "lucide-react";
 import { InstallPill } from "@/components/InstallPill";
 import type { Metadata } from "next";
 
@@ -17,7 +32,7 @@ export default function DocsPage() {
           Unified Configuration & Package Management for AI Agents
         </h1>
         <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-          The <code>agenthub</code> CLI allows engineers to discover, install, inspect, and synchronize rule sets, domain skills, and MCP servers across Google Antigravity, Claude Code, Cursor, Windsurf, and Codex.
+          The <code>agenthub</code> CLI allows engineers to discover, install, inspect, and synchronize rule sets, domain skills, and MCP servers across Google Antigravity, Claude Code, Cursor, Windsurf, Codex, GitHub Copilot CLI and Pi.
         </p>
       </div>
 
@@ -106,6 +121,163 @@ export default function DocsPage() {
         </div>
       </section>
 
+      {/* COMMAND: agenthub install */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <Download className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub install</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Install the skills and MCP servers declared in <code>agenthub.json</code>, at the versions pinned in <code>agenthub.lock.json</code>, then link skills and sync MCP configs. It shows the full plan with the exact command for every item and asks one y/N question. Planning runs nothing the hub declares, one failing item does not stop the others, and it never runs <code>sudo</code>.
+        </p>
+
+        <div className="space-y-3 font-mono">
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Plan, confirm once, install everything declared</div>
+            <InstallPill command="agenthub install" />
+            <InstallPill command="agenthub install --yes" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              Without a terminal and without <code>--yes</code>, nothing is installed and the items are reported as pending (exit code 1).
+            </p>
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># CI: fail instead of changing the lock file</div>
+            <InstallPill command="agenthub install --frozen-lockfile" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              A new pin, a hash that would be recorded, a pruned entry or a changed source all count as a change, and nothing is installed. On by default when <code>CI</code> is set; <code>--no-frozen-lockfile</code> turns it off. <code>pull</code> and <code>setup</code> take the same flag.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMAND: agenthub check */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <ListChecks className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub check</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Report what <code>update</code> would change, without installing anything. It resolves the latest pin of every declared source (<code>git ls-remote</code>, <code>npm view</code>, PyPI) and prints each item that is outdated or modified locally. It runs no command the hub declares and skips items you ignore with <code>agenthub ignore</code>.
+        </p>
+
+        <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2 font-mono">
+          <InstallPill command="agenthub check" />
+          <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+            Exits 1 if anything is outdated or modified, or if a source cannot be resolved. Exits 0 when everything is current.
+          </p>
+        </div>
+      </section>
+
+      {/* COMMAND: agenthub update */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <RefreshCw className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub update</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Move lock file pins forward, then install. A new pin drops the old content hash, and the next fetch records the new one. <code>update</code> is never frozen.
+        </p>
+
+        <div className="space-y-3 font-mono">
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Re-resolve every pin</div>
+            <InstallPill command="agenthub update" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Re-resolve only the named items</div>
+            <InstallPill command="agenthub update review fetch" />
+          </div>
+        </div>
+      </section>
+
+      {/* COMMAND: agenthub approvals */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <KeyRound className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub approvals</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          List the commands you have approved to run on this machine, or forget all of them. See{" "}
+          <a href="#remembered-approvals" className="text-signal-soft hover:text-signal">remembered approvals</a> below.
+        </p>
+
+        <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2 font-mono">
+          <InstallPill command="agenthub approvals" />
+          <InstallPill command="agenthub approvals --reset" />
+        </div>
+      </section>
+
+      {/* COMMAND: agenthub adopt */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <FolderInput className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub adopt</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Bring skills and MCP servers you already have in your assistants under the hub. It scans each detected assistant&rsquo;s skills folders and MCP configs and works out where each item came from by reading files only, including git checkouts and the <code>npx skills</code> lock file. Nothing from the item is executed.
+        </p>
+
+        <div className="space-y-3 font-mono">
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Show what was found and the proposed sources, change nothing</div>
+            <InstallPill command="agenthub adopt --dry-run" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Decide per item: accept, self-built, enter a source, or skip</div>
+            <InstallPill command="agenthub adopt" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Accept only sources read from the item itself, skip the rest</div>
+            <InstallPill command="agenthub adopt --yes" />
+            <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
+              After declaring items, <code>adopt</code> runs the normal install flow. Files are never deleted: the original of anything moved is kept in <code>backups/adopt-&lt;timestamp&gt;/</code> in the hub.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* COMMAND: agenthub doctor */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <Stethoscope className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">agenthub doctor</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          Check that things work, not only that files exist. It checks links, rules and MCP sync for every detected assistant, starts each MCP server and lists its tools, validates every skill&rsquo;s <code>SKILL.md</code>, and compares declared sources with the lock file and what is installed. Results are <code>[PASS]</code>, <code>[WARN]</code> or <code>[FAIL]</code>, and the exit code is 1 when anything fails.
+        </p>
+
+        <div className="space-y-3 font-mono">
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Everything, including the MCP server probes</div>
+            <InstallPill command="agenthub doctor" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># File checks only, starts nothing</div>
+            <InstallPill command="agenthub doctor --no-functional" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Allow slow npx or uvx cold starts (default 20 seconds per server)</div>
+            <InstallPill command="agenthub doctor --timeout 60" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Machine-readable output, same exit code</div>
+            <InstallPill command="agenthub doctor --json" />
+          </div>
+
+          <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
+            <div className="text-xs font-bold text-signal-soft"># Repair: offer the install flow, then relink and resync</div>
+            <InstallPill command="agenthub doctor --fix" />
+          </div>
+        </div>
+      </section>
+
       {/* COMMAND 4: sharing your setup */}
       <section className="space-y-4">
         <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
@@ -142,7 +314,7 @@ export default function DocsPage() {
             <InstallPill command="agenthub budget" />
             <InstallPill command="agenthub info ~/.agenthub" />
             <p className="font-sans text-xs text-[var(--muted-foreground)] pt-1">
-              <code>share</code> stops on hard-coded keys in skill or <code>scripts/</code> files and on high-risk scripts or MCP servers. It does not scan <code>rules/</code> or <code>mcp/servers.json</code>, so check those for pasted keys yourself. Fix what it finds, or pass <code>--force</code> if you are sure it is safe.
+              <code>share</code> stops on hard-coded keys in any hub file it pushes, including <code>rules/</code>, <code>agents/</code>, <code>skills/</code>, <code>mcp/servers.json</code>, <code>agenthub.json</code> and <code>README.md</code>, and on high-risk scripts or MCP servers. It only knows common key formats, so keep other secrets in environment variables. Fix what it finds, or pass <code>--force</code> if you are sure it is safe.
             </p>
           </div>
           <div className="border border-[var(--border)] rounded-lg p-4 bg-[var(--card)] space-y-2">
@@ -205,6 +377,65 @@ export default function DocsPage() {
         </div>
       </section>
 
+      {/* CONCEPT: declared sources */}
+      <section className="space-y-4">
+        <div className="flex items-center space-x-2 border-b border-[var(--border)] pb-2">
+          <GitBranch className="w-4 h-4 text-signal" />
+          <h2 className="text-base font-bold text-[var(--foreground)]">Where skills and MCP servers come from</h2>
+        </div>
+        <p className="text-[var(--muted-foreground)] leading-relaxed">
+          <code>agenthub.json</code> declares a source for each skill (under <code>skills</code>) and MCP server (under <code>mcp</code>), like a code dependency. <code>agenthub push</code> commits your own work and these declarations, never third-party copies; each machine fetches those with <code>agenthub install</code>. <code>agenthub add owner/repo</code> records what it adds as <code>github:owner/repo#&lt;path&gt;</code>.
+        </p>
+
+        <ul className="border border-[var(--border)] rounded-lg bg-[var(--card)] divide-y divide-[var(--border)]">
+          {[
+            { source: "local", text: <>Your own folder in <code>skills/&lt;name&gt;/</code> or <code>mcp/servers/&lt;name&gt;/</code>, committed to the hub.</> },
+            { source: "github:owner/repo#subpath", text: <>Cloned at the locked commit into <code>vendor/</code>. Add a <code>ref</code> (branch, tag or commit) to pin one. <code>git:&lt;url&gt;#subpath</code> works for any git URL.</> },
+            { source: "npm:pkg@range", text: <>A skill is unpacked into <code>vendor/</code>; an MCP server runs through <code>npx</code> at the locked version.</> },
+            { source: "pypi:pkg@range", text: <>MCP servers only. Runs through <code>uvx</code> at the locked version.</> },
+            { source: '{ "check", "install"?, "path"? }', text: <>A custom command. <code>check</code> runs first and <code>install</code> only if <code>check</code> fails. Without <code>install</code>, a failing check is a warning that tells you to install the item yourself.</> },
+          ].map((row) => (
+            <li key={row.source} className="grid sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)] gap-x-4 gap-y-1 px-4 py-3">
+              <code className="font-mono text-xs text-signal-soft break-all">{row.source}</code>
+              <span className="text-[var(--muted-foreground)] leading-relaxed">{row.text}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* CONCEPTS: lock file, approvals, shared skills folder */}
+      <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 space-y-4">
+        <h2 className="text-base font-bold text-[var(--foreground)] flex items-center space-x-2">
+          <Lock className="w-4 h-4 text-signal" />
+          <span>Lock file, approvals and the shared skills folder</span>
+        </h2>
+
+        <div className="space-y-3">
+          <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg space-y-1">
+            <h3 className="font-bold text-[var(--foreground)]">Lock file with content hashes</h3>
+            <p className="text-[var(--muted-foreground)] leading-relaxed">
+              <code>agenthub.lock.json</code> pins the commit of every <code>github:</code> and <code>git:</code> source and the exact version of every <code>npm:</code> and <code>pypi:</code> source. Commit it. Vendored skills and local MCP servers with a <code>build</code> also get a SHA-256 hash of their files, the same on Windows, macOS and Linux. <code>install</code> checks a fetched skill against that hash before it replaces anything, and a mismatch fails with &ldquo;content differs from lock&rdquo;. <code>doctor</code> and <code>check</code> report a skill whose files changed as modified locally. With <code>--frozen-lockfile</code>, any change to the lock fails instead.
+            </p>
+          </div>
+
+          <div id="remembered-approvals" className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg space-y-1 scroll-mt-20">
+            <h3 className="font-bold text-[var(--foreground)]">Remembered approvals</h3>
+            <p className="text-[var(--muted-foreground)] leading-relaxed">
+              When you approve a plan, each command (a custom <code>check</code>, <code>install</code> or <code>build</code>, a pinned fetch, an MCP probe) is remembered by a hash of its exact text, on this machine only and never in the hub repository. The next plan marks it <code>(approved before)</code> and asks only when a command is new or changed, so a <code>pull</code> that edits a command or moves a pin asks again. A build is also bound to its sources, and a probe to its full config. The contents of a script that a command runs are not covered. <code>--yes</code> approves and records; answering no records nothing.
+            </p>
+          </div>
+
+          <div className="p-3 bg-[var(--background)] border border-[var(--border)] rounded-lg space-y-1">
+            <h3 className="font-bold text-[var(--foreground)]">
+              The shared <code>~/.agents/skills</code> folder
+            </h3>
+            <p className="text-[var(--muted-foreground)] leading-relaxed">
+              <code>~/.agents/skills</code> is the cross-agent skills folder that Codex, Pi, Cursor, Windsurf and Copilot CLI read, and where <code>npx skills</code> installs. When Codex or Pi is detected, AgentHub links it to the hub and skips another link for any assistant that already loads the hub skills through it, so no assistant lists a skill twice. Claude Code and Antigravity keep their own. A real <code>~/.agents/skills</code> folder is copied into the hub first and kept as <code>skills.old</code>; run <code>agenthub adopt</code> to record where its skills came from.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ARCHITECTURE: The AST Rule Compiler */}
       <section className="bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 space-y-4">
         <h2 className="text-base font-bold text-[var(--foreground)] flex items-center space-x-2">
@@ -212,7 +443,7 @@ export default function DocsPage() {
           <span>How AgentHub Projections Work Under the Hood</span>
         </h2>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
-          Each assistant platform reads rules from distinct locations: Antigravity reads <code>GEMINI.md</code>, Claude Code reads <code>CLAUDE.md</code>, Cursor reads <code>agenthub.mdc</code>, and Codex reads <code>AGENTS.md</code>.
+          Each assistant platform reads rules from distinct locations: Antigravity reads <code>GEMINI.md</code>, Claude Code reads <code>CLAUDE.md</code>, Cursor reads <code>agenthub.mdc</code>, Windsurf reads <code>global_rules.md</code>, and Codex and Pi read <code>AGENTS.md</code>. GitHub Copilot CLI gets skills and MCP servers only.
         </p>
         <p className="text-[var(--muted-foreground)] leading-relaxed">
           Instead of maintaining duplicate Markdown files that drift over time, AgentHub stores rules as an <strong>AST (Abstract Syntax Tree)</strong>. When you install or switch profiles, AgentHub compiles and projects the rules with assistant-specific optimizations, token budgets, and override sections.
