@@ -6,6 +6,8 @@ export const ASSISTANT_LABELS: Record<string, string> = {
   codex: "Codex",
   gemini: "Antigravity",
   windsurf: "Windsurf",
+  copilot: "Copilot CLI",
+  pi: "Pi",
 };
 
 export const assistantLabel = (id: string) => ASSISTANT_LABELS[id.toLowerCase()] ?? id;

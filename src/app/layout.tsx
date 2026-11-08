@@ -6,7 +6,7 @@ import { getSessionUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "AgentHub | One set of agent rules for every coding assistant",
-  description: "Keep your agent rules, skills and MCP servers in one place and write them into Claude Code, Cursor, Codex, Antigravity and Windsurf. Browse shared setups and inspect what they add before you install.",
+  description: "Keep your agent rules, skills and MCP servers in one place and write them into Claude Code, Cursor, Codex, Antigravity, Windsurf, GitHub Copilot CLI and Pi. Browse shared setups and inspect what they add before you install.",
 };
 
 export default async function RootLayout({
